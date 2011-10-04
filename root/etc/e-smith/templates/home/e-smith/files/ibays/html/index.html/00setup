@@ -1,0 +1,7 @@
+{
+    use esmith::AccountsDB;
+
+    $adb = esmith::AccountsDB->open_ro();
+
+    "";
+}

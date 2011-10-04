@@ -1,0 +1,187 @@
+#!/usr/bin/perl -w
+
+#----------------------------------------------------------------------
+# copyright (C) 1999-2005 Mitel Networks Corporation
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+#
+#----------------------------------------------------------------------
+package esmith;
+
+use strict;
+use Errno;
+use File::Find;
+use esmith::util;
+use esmith::templates;
+use esmith::AccountsDB;
+
+
+$ENV{'PATH'} = "/bin";
+
+my $event = $ARGV [0];
+my $ibayName = $ARGV [1];
+
+die "ibayName argument missing" unless defined ($ibayName);
+
+my $accountdb = esmith::AccountsDB->open_ro();
+my $ibay = $accountdb->get($ibayName) or 
+	die "Couldn't find $ibayName record in accounts db\n";
+
+die "Account $ibayName is not an ibay account; modify ibay event failed.\n"
+    unless ($ibay->prop('type') eq 'ibay');
+
+if ($event eq 'ibay-create')
+{
+#------------------------------------------------------------
+# Check the Unix account.
+#------------------------------------------------------------
+
+    # Create the ibay's unique group first
+
+    system(
+        "/usr/sbin/groupadd",
+        "-g",
+	$ibay->prop("Gid"),
+        $ibayName
+    ) == 0 or die "Failed to create group $ibayName.\n";
+
+    system(
+        "/usr/sbin/useradd",
+        "-u",
+	$ibay->prop("Uid"),
+        "-g",
+	$ibay->prop("Gid"),
+        "-c",
+	$ibay->prop("Name"),
+        "-d",
+        "/home/e-smith/files/ibays/$ibayName/files",
+        "-G",
+        "shared,"
+	. $ibay->prop("Group"),
+        "-M",
+        "-s",
+        "/bin/false",
+        "$ibayName"
+    ) == 0 or die "Failed to create account $ibayName.\n";
+
+    #------------------------------------------------------------
+    # Create the ibay files and set the password.
+    #------------------------------------------------------------
+
+    system("/bin/cp", "-Rp", "/etc/e-smith/skel/ibay",
+	"/home/e-smith/files/ibays/$ibayName") == 0
+	    or die "Error copying ibay skeletal files";
+
+    processTemplate( {
+	TEMPLATE_PATH=>"/home/e-smith/files/ibays/html/index.html",
+	OUTPUT_FILENAME=>"/home/e-smith/files/ibays/$ibayName/html/index.html",
+	MORE_DATA=>{IBAY_NAME=>$ibayName},
+		} );
+
+    system("/usr/bin/passwd", "-l", $ibayName) == 0
+	or die "Error running /usr/bin/passwd command to lock account $ibayName";
+}
+elsif ($event eq 'ibay-modify')
+{
+    #------------------------------------------------------------
+    # Modify ibay description in /etc/passwd using "usermod"
+    #------------------------------------------------------------
+
+    system("/usr/sbin/usermod", "-c", $ibay->prop("Name"),
+    "-G", "shared," . $ibay->prop("Group"), "$ibayName") == 0
+        or die "Failed to modify account $ibayName.\n";
+
+}
+
+#------------------------------------------------------------
+# Fix permissions on ibay files.
+#------------------------------------------------------------
+
+#--------------------------------------------------
+# main directory is writeable only by root
+#--------------------------------------------------
+
+chdir "/home/e-smith/files/ibays/$ibayName"
+   or die "Could not chdir to /home/e-smith/files/ibays/$ibayName";
+
+mkdir '.AppleDesktop' unless (-d '.AppleDesktop');
+
+esmith::util::chownFile("root", "root", ".");
+chmod 0755, ".";
+
+#--------------------------------------------------
+# fix ownership of subdirectories
+#--------------------------------------------------
+
+#--------------------------------------------------
+# Set the group as apache if it was admin, since 
+# while set as admin, the web server no longer has
+# access to the ibay HTML directory, and web pages.
+#--------------------------------------------------
+
+my %properties = $ibay->props;
+$::group = ($properties{'Group'} eq "admin") ? "apache" : $properties {'Group'};
+
+# Make sensible defaults
+$::owner = undef;
+$::fileperm = 0600;
+$::dirperm = 0550;
+
+if ($properties {'UserAccess'} eq 'wr-admin-rd-group')
+{
+    $::owner = "admin";
+    $::fileperm = 0640;
+    $::dirperm = 02750;
+}
+elsif ($properties {'UserAccess'} eq 'wr-group-rd-group')
+{
+    $::fileperm = 0660;
+    $::dirperm = 02770;
+}
+elsif ($properties {'UserAccess'} eq 'wr-group-rd-everyone')
+{
+    $::fileperm = 0664;
+    $::dirperm = 02775;
+}
+else
+{
+    warn("Value of UserAccess bad or unset");
+}
+
+sub process
+{
+
+    if (-l)
+    {
+	$File::Find::prune = 1;
+    }
+    else
+    {
+	esmith::util::chownFile($::owner, $::group, $_);
+	if (-d)
+	{
+	    chmod $::dirperm, $_;
+	}
+	elsif (-f)
+	{
+	    # Preserve execute permissions on files
+	    my $experm = (stat($_))[2] & 0111;
+	    $experm |= $::fileperm;
+	    chmod $experm, $_;
+	}
+    }
+}
+
+find(\&process,  glob("* .AppleDesktop"));

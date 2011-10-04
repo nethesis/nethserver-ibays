@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+
+use esmith::Build::CreateLinks qw(:all);
+
+#--------------------------------------------------
+# functions for manager panel
+#--------------------------------------------------
+my $panel = "manager";
+
+panel_link("ibays", $panel);
+
+#--------------------------------------------------
+# actions for group-delete event
+#--------------------------------------------------
+
+$event = "group-delete";
+
+event_link("group-ibay-modify", $event, "10");
+
+#--------------------------------------------------
+# actions for ibay-delete event
+#--------------------------------------------------
+
+$event = "ibay-delete";
+
+event_link("ibay-delete", $event, "15");
+
+foreach my $event (qw(ibay-create ibay-modify ibay-modify-files))
+{
+    event_link("ibay-modify", $event, "15");
+}
+
+foreach my $event (qw(post-install post-upgrade))
+{
+    event_link("init-ibays", $event, "15");
+}
+
