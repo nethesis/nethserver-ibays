@@ -35,7 +35,7 @@ my $ibayName = $ARGV [1];
 
 die "ibayName argument missing" unless defined ($ibayName);
 
-my $accountdb = esmith::AccountsDB->open_ro();
+my $accountdb = esmith::AccountsDB->open();
 my $ibay = $accountdb->get($ibayName) or 
 	die "Couldn't find $ibayName record in accounts db\n";
 
@@ -50,31 +50,40 @@ if ($event eq 'ibay-create')
 
     # Create the ibay's unique group first
 
+    my $uid  = $accountdb->get_next_uid();
+
     system(
-        "/usr/sbin/groupadd",
+        "/usr/sbin/lgroupadd",
         "-g",
-	$ibay->prop("Gid"),
+	$uid,
         $ibayName
     ) == 0 or die "Failed to create group $ibayName.\n";
 
     system(
-        "/usr/sbin/useradd",
+        "/usr/sbin/luseradd",
         "-u",
-	$ibay->prop("Uid"),
+	$uid,
         "-g",
-	$ibay->prop("Gid"),
+	$uid,
         "-c",
 	$ibay->prop("Name"),
         "-d",
         "/home/e-smith/files/ibays/$ibayName/files",
-        "-G",
-        "shared,"
-	. $ibay->prop("Group"),
         "-M",
         "-s",
         "/bin/false",
         "$ibayName"
     ) == 0 or die "Failed to create account $ibayName.\n";
+
+    $accountdb->set_prop($ibayName,"Uid",$uid);
+    $accountdb->set_prop($ibayName,"Gid",$uid);
+
+    system("/usr/sbin/lgroupmod", "-M", $ibayName, 'shared') == 0
+        or die "Failed to add $ibayName into group shared.\n";
+    
+    system("/usr/sbin/lgroupmod", "-M", $ibayName, $ibay->prop("Group")) == 0
+        or die "Failed to add $ibayName into group ".$ibay->prop("Group").".\n";
+
 
     #------------------------------------------------------------
     # Create the ibay files and set the password.
@@ -90,18 +99,23 @@ if ($event eq 'ibay-create')
 	MORE_DATA=>{IBAY_NAME=>$ibayName},
 		} );
 
-    system("/usr/bin/passwd", "-l", $ibayName) == 0
-	or die "Error running /usr/bin/passwd command to lock account $ibayName";
+    system("/usr/sbin/lusermod", "-L", $ibayName) == 0
+	or die "Error locking account $ibayName";
 }
 elsif ($event eq 'ibay-modify')
 {
     #------------------------------------------------------------
-    # Modify ibay description in /etc/passwd using "usermod"
+    # Modify ibay description and group
     #------------------------------------------------------------
 
-    system("/usr/sbin/usermod", "-c", $ibay->prop("Name"),
-    "-G", "shared," . $ibay->prop("Group"), "$ibayName") == 0
+    system("/usr/sbin/lusermod", "-c", $ibay->prop("Name"), "$ibayName") == 0
         or die "Failed to modify account $ibayName.\n";
+    
+    system("/usr/sbin/lgroupmod", "-M", $ibayName, 'shared') == 0
+        or die "Failed to add $ibayName into group shared.\n";
+    
+    system("/usr/sbin/lgroupmod", "-M", $ibayName, $ibay->prop("Group")) == 0
+        or die "Failed to add $ibayName into group ".$ibay->prop("Group").".\n";
 
 }
 
@@ -126,7 +140,7 @@ chmod 0755, ".";
 #--------------------------------------------------
 
 #--------------------------------------------------
-# Set the group as apache if it was admin, since 
+# Set the group as www if it was admin, since 
 # while set as admin, the web server no longer has
 # access to the ibay HTML directory, and web pages.
 #--------------------------------------------------
@@ -152,6 +166,12 @@ elsif ($properties {'UserAccess'} eq 'wr-group-rd-group')
 }
 elsif ($properties {'UserAccess'} eq 'wr-group-rd-everyone')
 {
+    $::fileperm = 0664;
+    $::dirperm = 02775;
+}
+elsif ($properties {'UserAccess'} eq 'wr-everyone-rd-everyone')
+{
+    warn("UserAccess wr-everyone-rd-everyone not implemented, falling back to wr-group-rd-everyone");
     $::fileperm = 0664;
     $::dirperm = 02775;
 }

@@ -32,4 +32,4 @@ then
 fi
 
 /bin/rm -rf /home/e-smith/files/ibays/$ibay
-exec /usr/sbin/userdel "$ibay"
+exec /usr/sbin/luserdel "$ibay"
