@@ -73,12 +73,12 @@ foreach (qw(Primary Primary/cgi-bin Primary/html Primary/files))
 if( !grep /\.\w+$/, </home/e-smith/files/ibays/Primary/html/index.*> )
 {
     system("/bin/cp", "-p",
-	"/etc/e-smith/skel/e-smith/files/primary/html/index.htm",
-	"/home/e-smith/files/ibays/Primary/html/index.htm");
+	"/etc/e-smith/skel/e-smith/files/primary/html/index.html",
+	"/home/e-smith/files/ibays/Primary/html/index.html");
 
-    chmod 0640, "/home/e-smith/files/ibays/Primary/html/index.htm";
+    chmod 0640, "/home/e-smith/files/ibays/Primary/html/index.html";
     esmith::util::chownFile('admin', 'shared',
-	"/home/e-smith/files/ibays/Primary/html/index.htm");
+	"/home/e-smith/files/ibays/Primary/html/index.html");
 }
 
 exit (0);
