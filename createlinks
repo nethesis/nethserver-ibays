@@ -35,3 +35,9 @@ foreach my $event (qw(post-install post-upgrade))
     event_link("init-ibays", $event, "15");
 }
 
+#--------------------------------------------------
+# actions for ibay-name validator
+#--------------------------------------------------
+my $validator = 'ibay-name';
+validator_link("uniq-account", $validator, 20);
+validator_link("ibay-length", $validator, 30);
