@@ -9,15 +9,18 @@ use strict;
 #
 
 use esmith::AccountsDB;
+use esmith::event;
 
-my $accountsDb = esmith::AccountsDB->open_ro();
-my $gid = getgrnam('shared');
+my $errors = 0;
+my $accountsDb = esmith::AccountsDB->open_ro() or die("Fatal error opening accounts DB\n");
 my $lgroupadd = '/usr/sbin/lgroupadd';
 my $lgroupmod = '/usr/sbin/lgroupmod';
 
 #
 # Create shared group if not exists
 #
+my $gid = getgrnam('shared');
+
 if(!$gid) {
     system($lgroupadd, 'shared');
 }
@@ -29,4 +32,22 @@ my @users = map { $_->key } $accountsDb->users();
 #
 system($lgroupmod, '-M', join(',', 'admin', @users), 'shared');
 
-exit($?);
+if($? != 0) {
+    $errors ++;
+}
+
+#
+# Create ibay if db record is present but directory is missing:
+#
+foreach my $ibay ($accountsDb->ibays()) {
+    my $ibayName = $ibay->key();
+    if ( -d "/home/e-smith/files/ibays/$ibayName" ) {
+	next;
+    }
+
+    if(event_signal('ibay-create', $ibayName) == 0) {
+	$errors ++;
+    }
+}
+
+exit($errors > 0 ? 1 : 0);
