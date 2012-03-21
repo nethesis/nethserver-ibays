@@ -1,32 +1,33 @@
 #!/usr/bin/perl -w
 
 use esmith::Build::CreateLinks qw(:all);
+use File::Path;
 
 # Group ownership is changed to admin group, 
 # if the ibay group owner is deleted:
-event_action('group-delete', 
+event_actions('group-delete', 
 	     "nethserver-ibays-reset-group" => "10"
     );
 
 # create
-event_action('ibay-create', 
+event_actions('ibay-create', 
 	     "nethserver-ibays-ibay-create" => "15",
 	     "nethserver-ibays-set-permissions" => "20"
     );
 
 # modify
-event_action('ibay-modify', 
+event_actions('ibay-modify', 
 	     "nethserver-ibays-ibay-modify" => "15",
 	     "nethserver-ibays-set-permissions" => "20"
     );
 
 # delete
-event_action('ibay-delete', 
+event_actions('ibay-delete', 
 	     'nethserver-ibays-ibay-delete' => '15'
     );
 
 # package install/update
-event_action('nethserver-ibays-update'
+event_actions('nethserver-ibays-update',
 	     'initialize-default-databases' => '00',
 	     'nethserver-ibays-conf' => '30'
     );
@@ -37,3 +38,25 @@ event_action('nethserver-ibays-update'
 my $validator = 'ibay-name';
 validator_link("uniq-account", $validator, 20);
 validator_link("ibay-length", $validator, 30);
+
+
+# Force creation of potentially empty directories
+{
+    my $perms = {
+	verbose => 1,
+	mode => 0755,
+    };
+
+    File::Path::make_path("root/etc/e-smith/skel/ibay/$_", $perms) foreach(qw{
+        cgi-bin
+        files 
+        html 
+        .AppleDesktop
+    });
+    
+    File::Path::make_path(
+	'root/etc/e-smith/skel/e-smith/files/ibays',
+	'root/home/e-smith/files/ibays',
+	$perms
+	);
+}
