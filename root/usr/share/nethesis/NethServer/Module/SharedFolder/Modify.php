@@ -141,7 +141,11 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     protected function onParametersSaved($changedParameters)
     {
-        $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $this->getIdentifier()), array(array($this, 'provideIbayName')));
+        $action = $this->getIdentifier();        
+        if($action == 'update') {
+            $action = 'modify';        
+        }
+        $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $action), array(array($this, 'provideIbayName')));
     }
 
     /**
