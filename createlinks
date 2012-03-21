@@ -2,38 +2,34 @@
 
 use esmith::Build::CreateLinks qw(:all);
 
-#--------------------------------------------------
-# functions for manager panel
-#--------------------------------------------------
-my $panel = "manager";
+# Group ownership is changed to admin group, 
+# if the ibay group owner is deleted:
+event_action('group-delete', 
+	     "nethserver-ibays-reset-group" => "10"
+    );
 
-panel_link("ibays", $panel);
+# create
+event_action('ibay-create', 
+	     "nethserver-ibays-ibay-create" => "15",
+	     "nethserver-ibays-set-permissions" => "20"
+    );
 
-#--------------------------------------------------
-# actions for group-delete event
-#--------------------------------------------------
+# modify
+event_action('ibay-modify', 
+	     "nethserver-ibays-ibay-modify" => "15",
+	     "nethserver-ibays-set-permissions" => "20"
+    );
 
-$event = "group-delete";
+# delete
+event_action('ibay-delete', 
+	     'nethserver-ibays-ibay-delete' => '15'
+    );
 
-event_link("group-ibay-modify", $event, "10");
-
-#--------------------------------------------------
-# actions for ibay-delete event
-#--------------------------------------------------
-
-$event = "ibay-delete";
-
-event_link("ibay-delete", $event, "15");
-
-foreach my $event (qw(ibay-create ibay-modify ibay-modify-files))
-{
-    event_link("ibay-modify", $event, "15");
-}
-
-foreach my $event (qw(post-install post-upgrade))
-{
-    event_link("init-ibays", $event, "15");
-}
+# package install/update
+event_action('nethserver-ibays-update'
+	     'initialize-default-databases' => '00',
+	     'nethserver-ibays-conf' => '30'
+    );
 
 #--------------------------------------------------
 # actions for ibay-name validator

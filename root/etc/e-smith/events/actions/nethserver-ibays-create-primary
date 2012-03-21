@@ -26,28 +26,9 @@ use strict;
 use Errno;
 use esmith::util;
 
-#------------------------------------------------------------
-# Now create the /home/e-smith subdirectories. An upgrade from
-# the original e-smith 3.0 can sometimes corrupt this structure,
-# so make sure every single directory is there.
-# 
-# Before we start, remember if there was a /home/e-smith directory.
-# If so, we will do a factory reset afterward to make sure there
-# is a reasonable default configuration.
-#------------------------------------------------------------
 
 my $files = "/home/e-smith/files";
 
-unless (-l "$files/primary")
-{
-    if (-d "$files/primary")
-    {
-	rename("$files/primary", "$files/ibays/Primary")
-	    or warn("Could not rename primary i-bay: $!");
-    }
-    symlink("$files/ibays/Primary", "$files/primary")
-	or warn("Could not create primary legacy symlink: $!");
-}
 
 # Populate pre-defined Primary i-bay
 # Start with top level owner/permissions

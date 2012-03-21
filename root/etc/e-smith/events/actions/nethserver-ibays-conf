@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+
+#
+# NethServer - nethserver-ibay-conf
+#
+# Copyright (C) 2012 Nethesis srl
+#
+
+use esmith::AccountsDB;
+
+my $accountsDb = esmith::AccountsDB->open_ro();
+my $gid = getgrnam('shared');
+my $lgroupadd = '/usr/sbin/lgroupadd';
+my $lgroupmod = '/usr/sbin/lgroupmod';
+
+#
+# Create shared group if not exists
+#
+if(!$gid) {
+    system($lgroupadd, 'shared');
+}
+
+my @users = map { $_->key } $accountsDb->users();
+
+#
+# Assign admin and all known users to shared group:
+#
+system($lgroupmod, '-M', join(',', 'admin', @users), 'shared');
+
+exit($?);

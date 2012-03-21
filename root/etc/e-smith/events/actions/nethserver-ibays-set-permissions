@@ -39,85 +39,10 @@ my $accountdb = esmith::AccountsDB->open();
 my $ibay = $accountdb->get($ibayName) or 
 	die "Couldn't find $ibayName record in accounts db\n";
 
-die "Account $ibayName is not an ibay account; modify ibay event failed.\n"
-    unless ($ibay->prop('type') eq 'ibay');
-
-if ($event eq 'ibay-create')
-{
-#------------------------------------------------------------
-# Check the Unix account.
-#------------------------------------------------------------
-
-    # Create the ibay's unique group first
-
-    my $uid  = $accountdb->get_next_uid();
-
-    system(
-        "/usr/sbin/lgroupadd",
-        "-g",
-	$uid,
-        $ibayName
-    ) == 0 or die "Failed to create group $ibayName.\n";
-
-    system(
-        "/usr/sbin/luseradd",
-        "-u",
-	$uid,
-        "-g",
-	$uid,
-        "-c",
-	$ibay->prop("Name"),
-        "-d",
-        "/home/e-smith/files/ibays/$ibayName/files",
-        "-M",
-        "-s",
-        "/bin/false",
-        "$ibayName"
-    ) == 0 or die "Failed to create account $ibayName.\n";
-
-    $accountdb->set_prop($ibayName,"Uid",$uid);
-    $accountdb->set_prop($ibayName,"Gid",$uid);
-
-    system("/usr/sbin/lgroupmod", "-M", $ibayName, 'shared') == 0
-        or die "Failed to add $ibayName into group shared.\n";
-    
-    system("/usr/sbin/lgroupmod", "-M", $ibayName, $ibay->prop("Group")) == 0
-        or die "Failed to add $ibayName into group ".$ibay->prop("Group").".\n";
-
-
-    #------------------------------------------------------------
-    # Create the ibay files and set the password.
-    #------------------------------------------------------------
-
-    system("/bin/cp", "-Rp", "/etc/e-smith/skel/ibay",
-	"/home/e-smith/files/ibays/$ibayName") == 0
-	    or die "Error copying ibay skeletal files";
-
-    processTemplate( {
-	TEMPLATE_PATH=>"/home/e-smith/files/ibays/html/index.html",
-	OUTPUT_FILENAME=>"/home/e-smith/files/ibays/$ibayName/html/index.html",
-	MORE_DATA=>{IBAY_NAME=>$ibayName},
-		} );
-
-    system("/usr/sbin/lusermod", "-L", $ibayName) == 0
-	or die "Error locking account $ibayName";
+if ($ibay->prop('type') ne 'ibay') {
+    die "Account $ibayName is not an ibay account; modify ibay event failed.\n"
 }
-elsif ($event eq 'ibay-modify')
-{
-    #------------------------------------------------------------
-    # Modify ibay description and group
-    #------------------------------------------------------------
 
-    system("/usr/sbin/lusermod", "-c", $ibay->prop("Name"), "$ibayName") == 0
-        or die "Failed to modify account $ibayName.\n";
-    
-    system("/usr/sbin/lgroupmod", "-M", $ibayName, 'shared') == 0
-        or die "Failed to add $ibayName into group shared.\n";
-    
-    system("/usr/sbin/lgroupmod", "-M", $ibayName, $ibay->prop("Group")) == 0
-        or die "Failed to add $ibayName into group ".$ibay->prop("Group").".\n";
-
-}
 
 #------------------------------------------------------------
 # Fix permissions on ibay files.

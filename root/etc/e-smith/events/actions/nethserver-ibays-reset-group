@@ -4,27 +4,30 @@ use strict;
 use esmith::AccountsDB;
 use esmith::event;
 
+my $errors = 0;
+
+#
+# This action is executed on group deletion
+#
+
 my $accounts = esmith::AccountsDB->open() or 
     die "Unable to open accounts db: $!";
 
-my ($self, $groupName) = @ARGV;
+my ($eventName, $deleted_group) = @ARGV;
 
 # Find all "i-bay" entries in the e-smith accounts database and
 # if the group matches this one, change it to group "admin".
  
 my @modified_ibays;
+
 foreach my $ibay ( $accounts->ibays ) {
-    if ( $ibay->prop('Group') eq $groupName ) {
+    if ( $ibay->prop('Group') eq $deleted_group ) {
 	$ibay->set_prop( 'Group', 'admin' );
 	push @modified_ibays, $ibay->key;
-	event_signal("ibay-modify-files", $ibay->key) or
-	    die ("Error occurred while updating i-bay.\n");
+	if( ! event_signal('ibay-modify', $ibay->key) ) {
+	    $errors ++;
+	}
     }
 }
 
-my $count = @modified_ibays;
-if ( $count > 0 ) {
-    event_signal("ibay-modify-servers" ) or
-	die ("Error occurred after updating i-bays.\n");
-}
-
+exit($errors > 0 ? 1 : 0);
