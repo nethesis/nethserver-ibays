@@ -32,6 +32,10 @@ event_actions('nethserver-ibays-update',
 	     'nethserver-ibays-conf' => '30'
     );
 
+# user create: add to "shared" group
+event_actions('user-create',
+	      'nethserver-ibays-user-create' => '30');
+
 #--------------------------------------------------
 # actions for ibay-name validator
 #--------------------------------------------------
