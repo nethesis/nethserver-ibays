@@ -33,8 +33,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
+        $ibayNameValidator = $this->createValidator()->orValidator(
+            $this->createValidator(Validate::USERNAME), $this->createValidator()->equalTo('Primary')
+        );
+
         $parameterSchema = array(
-            array('ibay', Validate::USERNAME, Table::KEY),
+            array('ibay', $ibayNameValidator, Table::KEY),
             array('Name', Validate::ANYTHING, Table::FIELD),
             array('Group', Validate::USERNAME, Table::FIELD),
             array('CgiBin', Validate::SERVICESTATUS, Table::FIELD),
@@ -141,9 +145,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     protected function onParametersSaved($changedParameters)
     {
-        $action = $this->getIdentifier();        
-        if($action == 'update') {
-            $action = 'modify';        
+        $action = $this->getIdentifier();
+        if ($action == 'update') {
+            $action = 'modify';
         }
         $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $action), array(array($this, 'provideIbayName')));
     }
@@ -187,4 +191,3 @@ class Modify extends \Nethgui\Controller\Table\Modify
     }
 
 }
-
