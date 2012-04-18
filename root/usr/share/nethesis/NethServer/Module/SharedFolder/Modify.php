@@ -33,9 +33,16 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
-        $ibayNameValidator = $this->createValidator()->orValidator(
-            $this->createValidator(Validate::USERNAME), $this->createValidator()->equalTo('Primary')
-        );
+        /*
+         * Refs #941. Avoid deletion of Primary ibay
+         */
+        if ($this->getIdentifier() === 'delete') {
+            $ibayNameValidator = $this->createValidator(Validate::USERNAME);
+        } else {
+            $ibayNameValidator = $this->createValidator()->orValidator(
+                $this->createValidator(Validate::USERNAME), $this->createValidator()->equalTo('Primary')
+            );
+        }
 
         $parameterSchema = array(
             array('ibay', $ibayNameValidator, Table::KEY),
