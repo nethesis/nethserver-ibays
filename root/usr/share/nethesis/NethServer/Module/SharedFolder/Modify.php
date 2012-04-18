@@ -38,6 +38,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
          */
         if ($this->getIdentifier() === 'delete') {
             $ibayNameValidator = $this->createValidator(Validate::USERNAME);
+        } elseif ($this->getIdentifier() === 'create') {
+            $ibayNameValidator = $this->createValidator(Validate::USERNAME)->platform('ibay-name');
         } else {
             $ibayNameValidator = $this->createValidator()->orValidator(
                 $this->createValidator(Validate::USERNAME), $this->createValidator()->equalTo('Primary')
