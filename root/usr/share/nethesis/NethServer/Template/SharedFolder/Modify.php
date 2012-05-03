@@ -11,7 +11,7 @@ echo $view->header('ibay')->setAttribute('template', $view->translate($template)
 $baseTab = $view->panel()->setAttribute('name', "BaseInfo")
     ->insert($view->textInput('ibay', $keyFlags))
     ->insert($view->textInput('Name'))
-    ->insert($view->selector('Group', $view::SELECTOR_DROPDOWN)->setAttribute('choices', 'OwnersDatasource'));
+;
 
 $baseTabColumnSet1 = $view->columns();
 $baseTab->insert($baseTabColumnSet1);
@@ -30,6 +30,7 @@ $baseTab->insert($view->fieldset()->setAttribute('template', 'Web server options
         ->insert($view->checkBox('CgiBin', 'enabled')->setAttribute('uncheckedValue', 'disabled')));
 
 $permissionTab = $view->panel()->setAttribute('name', 'Permissions')
+    ->insert($view->selector('Group', $view::SELECTOR_DROPDOWN)->setAttribute('choices', 'OwnersDatasource'))
     ->insert($view->columns()
     ->insert($view->fieldset()->setAttribute('template', 'Read permissions') //->setAttribute('icon-before', 'ui-icon-folder-open')
         ->insert($view->radioButton('read', 'admin'))
