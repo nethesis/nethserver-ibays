@@ -1,4 +1,6 @@
 <?php
+$view->requireFlag($view::INSET_FORM);
+
 if ($view->getModule()->getIdentifier() == 'update') {
     $keyFlags = $view::STATE_READONLY;
     $template = 'Edit shared folder `${0}`';
@@ -13,18 +15,9 @@ $baseTab = $view->panel()->setAttribute('name', "BaseInfo")
     ->insert($view->textInput('Name'))
 ;
 
-$baseTabColumnSet1 = $view->columns();
-$baseTab->insert($baseTabColumnSet1);
-
-$baseTabColumnSet1->insert($view->fieldset()->setAttribute('template', 'Recycle')
-        ->insert($view->fieldsetSwitch('RecycleBin', 'enabled')
-            ->insert($view->checkBox('KeepVersions', 'enabled')->setAttribute('uncheckedValue', 'disabled'))
-        )
-        ->insert($view->fieldsetSwitch('RecycleBin', 'disabled')));
-
-$baseTabColumnSet1->insert($view->fieldset()->setAttribute('template', 'Shadow copy')
-        ->insert($view->fieldsetSwitch('ShadowCopy', 'enabled'))
-        ->insert($view->fieldsetSwitch('ShadowCopy', 'disabled')));
+foreach ($view['Plugin'] as $pluginView) {        
+    $baseTab->insert($view->literal($pluginView));
+}
 
 $baseTab->insert($view->fieldset()->setAttribute('template', 'Web server options') // ->setAttribute('icon-before', 'ui-icon-link')
         ->insert($view->checkBox('CgiBin', 'enabled')->setAttribute('uncheckedValue', 'disabled')));

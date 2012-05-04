@@ -59,9 +59,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('read', '/^(admin|group|everyone)$/', null),
             array('write', '/^(admin|group|everyone)$/', null),
             array('OwnersDatasource', false, null),
-            array('ShadowCopy', Validate::SERVICESTATUS, Table::FIELD),
-            array('RecycleBin', Validate::SERVICESTATUS, Table::FIELD),
-            array('KeepVersions', Validate::SERVICESTATUS, Table::FIELD),
             array('AclRead', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclRead', ','), // ACL
             array('AclWrite', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclWrite', ','), // ACL
             array('AclSubjects', FALSE, null),
@@ -139,15 +136,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
             if (is_null($this->parameters['Group'])) {
                 $this->parameters['Group'] = 'shared';
-            }
-            if (is_null($this->parameters['ShadowCopy'])) {
-                $this->parameters['ShadowCopy'] = 'disabled';
-            }
-            if (is_null($this->parameters['RecycleBin'])) {
-                $this->parameters['RecycleBin'] = 'disabled';
-            }
-            if (is_null($this->parameters['KeepVersions'])) {
-                $this->parameters['KeepVersions'] = 'disabled';
             }
         }
     }
