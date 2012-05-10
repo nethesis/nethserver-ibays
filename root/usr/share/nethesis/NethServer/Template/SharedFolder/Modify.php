@@ -19,9 +19,6 @@ foreach ($view['Plugin'] as $pluginView) {
     $baseTab->insert($view->literal($pluginView));
 }
 
-$baseTab->insert($view->fieldset()->setAttribute('template', 'Web server options') // ->setAttribute('icon-before', 'ui-icon-link')
-        ->insert($view->checkBox('CgiBin', 'enabled')->setAttribute('uncheckedValue', 'disabled')));
-
 $permissionTab = $view->panel()->setAttribute('name', 'Permissions')
     ->insert($view->selector('Group', $view::SELECTOR_DROPDOWN)->setAttribute('choices', 'OwnersDatasource'))
     ->insert($view->columns()

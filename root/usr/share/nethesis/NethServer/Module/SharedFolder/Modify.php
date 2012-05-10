@@ -49,8 +49,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $parameterSchema = array(
             array('ibay', $ibayNameValidator, Table::KEY),
             array('Name', Validate::ANYTHING, Table::FIELD),
-            array('Group', Validate::USERNAME, Table::FIELD),
-            array('CgiBin', Validate::SERVICESTATUS, Table::FIELD),
+            array('Group', Validate::USERNAME, Table::FIELD),            
             array('UserAccess', false, Table::FIELD), //possibile values: global|global-pw|global-pw-remote|local|local-pw|none
             array('PublicAccess', false, Table::FIELD), //possibile values: wr-admin-rd-group|wr-group-rd-everyone|wr-group-rd-group
             array('access', '/global|local/', null), // do not map on any datasource
