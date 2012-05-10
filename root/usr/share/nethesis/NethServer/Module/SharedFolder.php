@@ -2,7 +2,7 @@
 namespace NethServer\Module;
 
 /*
- * Copyright (C) 2011 Nethesis S.r.l.
+ * Copyright (C) 2012 Nethesis S.r.l.
  * 
  * This script is part of NethServer.
  * 
@@ -44,7 +44,7 @@ class SharedFolder extends \Nethgui\Controller\TableController
         $this
             ->setTableAdapter($this->getPlatform()->getTableAdapter('accounts', 'ibay'))
             ->setColumns($columns)
-            ->addTableAction(new SharedFolder\Modify('create'))
+            ->addTableActionPluggable(new SharedFolder\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->addRowActionPluggable(new SharedFolder\Modify('update'))
             ->addRowAction(new SharedFolder\Modify('delete'))

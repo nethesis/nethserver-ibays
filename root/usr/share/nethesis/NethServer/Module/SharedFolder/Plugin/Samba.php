@@ -29,7 +29,7 @@ use Nethgui\Controller\Table\Modify as Table;
  * @author Davide Principi <davide.principi@nethesis.it>
  * @since 1.0
  */
-class Samba extends \Nethgui\Controller\Table\RowAbstractAction
+class Samba extends \Nethgui\Controller\Table\RowPluginAction
 {
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
@@ -37,34 +37,25 @@ class Samba extends \Nethgui\Controller\Table\RowAbstractAction
         return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Service', 10);
     }
 
-    public function getKeyValue(\Nethgui\Controller\RequestInterface $request)
-    {
-        return \Nethgui\array_head($request->getPath());
-    }
-
     public function initialize()
     {
-        $parameterSchema = array(
-            array('ibay', FALSE, Table::KEY), // KEY placeholder
+        $schema = array(
             array('ShadowCopy', Validate::SERVICESTATUS, Table::FIELD),
             array('RecycleBin', Validate::SERVICESTATUS, Table::FIELD),
             array('KeepVersions', Validate::SERVICESTATUS, Table::FIELD),
         );
 
-        $this->setSchema($parameterSchema);
+        $this->setSchemaAddition($schema);
         parent::initialize();
     }
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
         parent::bind($request);
-        if (is_null($this->parameters['ShadowCopy'])) {
+        if ( ! $request->isMutation()
+            && $this->getPluggableActionIdentifier() === 'create') {
             $this->parameters['ShadowCopy'] = 'disabled';
-        }
-        if (is_null($this->parameters['RecycleBin'])) {
             $this->parameters['RecycleBin'] = 'disabled';
-        }
-        if (is_null($this->parameters['KeepVersions'])) {
             $this->parameters['KeepVersions'] = 'disabled';
         }
     }

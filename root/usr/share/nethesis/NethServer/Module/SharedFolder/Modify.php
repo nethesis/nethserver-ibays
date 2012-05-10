@@ -121,12 +121,11 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
     }
 
-    // TODO: validate: check iBay name uniqueness
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
         parent::bind($request);
         if ($request->isMutation()) {
-            if ($this->getIdentifier() != "delete") { //do not set props if we are deleting the ibay
+            if ($this->getIdentifier() !== "delete") { //do not set props if we are deleting the ibay
                 $this->parameters['UserAccess'] = $this->composeUserAccess();
                 $this->parameters['PublicAccess'] = $this->composePublicAccess();
             }
@@ -134,7 +133,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $this->assignPublicAccess($this->parameters['PublicAccess']);
             $this->assignUserAccess($this->parameters['UserAccess']);
 
-            if (is_null($this->parameters['Group'])) {
+            if ( ! isset($this->parameters['Group'])) {
                 $this->parameters['Group'] = 'shared';
             }
         }
