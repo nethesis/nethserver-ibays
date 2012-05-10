@@ -42,18 +42,6 @@ $L['ibay-create_failure'] = 'Errore nella creazione della cartella condivisa "${
 $L['ibay-delete_success'] = 'La cartella condivisa "${1}" è stata eliminata';
 $L['ibay-delete_failure'] = 'Errore nell\'eliminazione della cartella condivisa "${1}"';
 
-$L['Web server options'] = 'Opzioni del server web';
-$L['Shadow copy'] = 'Shadow copy';
-$L['shadow_enabled_label'] = 'Abilita';
-$L['shadow_disabled_label'] = 'Disabilita';
-$L['Recycle'] = 'Cestino di rete';
-$L['RecycleBin_enabled_label'] = 'Abilita';
-$L['RecycleBin_disabled_label'] = 'Disabilita';
-$L['KeepVersions_label'] = 'Non sovrascrivere file esistenti';
-
-$L['ShadowCopy_enabled_label'] = 'Abilita';
-$L['ShadowCopy_disabled_label'] = 'Disabilita';
-
 $L['BaseInfo_Title'] = 'Generale';
 $L['Permissions_Title'] = 'Permessi';
 

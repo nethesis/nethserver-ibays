@@ -42,17 +42,5 @@ $L['ibay-create_failure'] = 'Some errors occured during sahred folder "${1}" cre
 $L['ibay-delete_success'] = 'Shared folder "${1}" has been deleted';
 $L['ibay-delete_failure'] = 'Some errors occured when deleting shared folder "${1}"';
 
-$L['Web server options'] = 'Web server options';
-$L['Shadow copy'] = 'Shadow copy';
-$L['shadow_enabled_label'] = 'Enable';
-$L['shadow_disabled_label'] = 'Disable';
-$L['Recycle'] = 'Network Recycle';
-$L['RecycleBin_enabled_label'] = 'Enable';
-$L['RecycleBin_disabled_label'] = 'Disable';
-$L['KeepVersions_label'] = 'Do not overwrite existing files';
-
-$L['ShadowCopy_enabled_label'] = 'Enable shadow copy';
-$L['ShadowCopy_disabled_label'] = 'Disable shadow copy';
-
 $L['BaseInfo_Title'] = 'General';
 $L['Permissions_Title'] = 'Permissions';
