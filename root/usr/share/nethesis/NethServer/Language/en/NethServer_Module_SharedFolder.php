@@ -3,6 +3,7 @@
  */
 
 $L['SharedFolder_Title'] = 'Shared Folders';
+$L['SharedFolder_Description'] = 'Share folders and files between users and groups';
 $L['change-password_label'] = 'Change passowrd';
 $L['ibay_label'] = 'Shared folder name';
 $L['Key_label'] = 'Folder';
@@ -26,7 +27,7 @@ $L['Access control'] = 'Access control';
 $L['access_local_label'] = 'Access from local network';
 $L['access_global_label'] = 'Access from any network';
 $L['The shared folder "${0}" already exists!'] = 'The shared folder "${0}" already exists!';
-$L['CgiBin_label'] = 'Execute dynamic contents (CGI, PHP, SSI)';
+
 $L['Read permissions'] = 'Read Permission';
 $L['Write permissions'] = 'Write Permission';
 $L['local_password_label'] = 'Ask for password';

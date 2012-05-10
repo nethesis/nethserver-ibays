@@ -3,6 +3,7 @@
  */
 
 $L['SharedFolder_Title'] = 'Cartelle condivise';
+$L['SharedFolder_Description'] = 'Condividi file e cartelle tra utenti e gruppi';
 $L['change-password_label'] = 'Cambia password';
 $L['ibay_label'] = 'Nome cartella condivisa';
 $L['Key_label'] = 'Cartella';
@@ -26,7 +27,7 @@ $L['Access control'] = 'Controllo di accesso';
 $L['access_local_label'] = 'Accesso da rete locale';
 $L['access_global_label'] = 'Accesso da qualsiasi rete';
 $L['The shared folder "${0}" already exists!'] = 'La cartella condivisa "${0}" esiste già!';
-$L['CgiBin_label'] = 'Esegui contenuti dinamici (CGI, PHP, SSI)';
+
 $L['Read permissions'] = 'Permessi di lettura';
 $L['Write permissions'] = 'Permessi di scrittura';
 $L['local_password_label'] = 'Richiedi password';
