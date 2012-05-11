@@ -30,10 +30,6 @@ $L['The shared folder "${0}" already exists!'] = 'The shared folder "${0}" alrea
 
 $L['Read permissions'] = 'Read Permission';
 $L['Write permissions'] = 'Write Permission';
-$L['local_password_label'] = 'Ask for password';
-$L['global_password_pw_label'] = 'Ask for password';
-$L['global_password__label'] = 'No password needed';
-$L['global_password_pw-remote_label'] = 'Ask password for remote network only';
 
 $L['ibay-modify_success'] = 'Shared folder has been modified correctly.';
 $L['ibay-modify_failure'] = 'Some errors occured during shared folder "${1}" configuration';

@@ -33,15 +33,6 @@ $permissionTab = $view->panel()->setAttribute('name', 'Permissions')
 );
 
 
-$permissionTab->insert($view->fieldset()->setAttribute('template', 'Access control') // ->setAttribute('icon-before', 'ui-icon-locked')
-        ->insert($view->fieldsetSwitch('access', 'local')
-            ->insert($view->checkBox('local_password', 'pw')))
-        ->insert($view->fieldsetSwitch('access', 'global')
-            ->insert($view->radioButton('global_password', 'pw'))
-            ->insert($view->radioButton('global_password', 'pw-remote'))
-            ->insert($view->radioButton('global_password', '')))
-);
-
 $aclTab = $view->panel()->setAttribute('name', "Acl")
     ->insert($view->objectPicker()
     ->setAttribute('objects', 'AclSubjects')

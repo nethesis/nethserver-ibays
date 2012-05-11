@@ -30,10 +30,6 @@ $L['The shared folder "${0}" already exists!'] = 'La cartella condivisa "${0}" e
 
 $L['Read permissions'] = 'Permessi di lettura';
 $L['Write permissions'] = 'Permessi di scrittura';
-$L['local_password_label'] = 'Richiedi password';
-$L['global_password_pw_label'] = 'Richiedi password';
-$L['global_password__label'] = 'Non richiedere la password';
-$L['global_password_pw-remote_label'] = 'Richiedi password solo per reti remote';
 
 $L['ibay-modify_success'] = 'Le modifiche alla cartella condivisa sono state salvate correttamente';
 $L['ibay-modify_failure'] = 'Errore nel salvataggio delle modifiche per la cartella condivisa "${1}"';
