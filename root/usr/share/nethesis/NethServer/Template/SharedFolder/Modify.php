@@ -15,10 +15,6 @@ $baseTab = $view->panel()->setAttribute('name', "BaseInfo")
     ->insert($view->textInput('Name'))
 ;
 
-foreach ($view['Plugin'] as $pluginView) {        
-    $baseTab->insert($view->literal($pluginView));
-}
-
 $permissionTab = $view->panel()->setAttribute('name', 'Permissions')
     ->insert($view->selector('Group', $view::SELECTOR_DROPDOWN)->setAttribute('choices', 'OwnersDatasource'))
     ->insert($view->columns()
@@ -40,7 +36,11 @@ $aclTab = $view->panel()->setAttribute('name', "Acl")
     ->insert($view->checkBox('AclWrite', FALSE))
 );
 
-echo $view->tabs()->insert($baseTab)->insert($permissionTab)->insert($aclTab);
+echo $view->tabs()
+    ->insert($baseTab->insert($view->literal($permissionTab)))
+    ->insertPlugins()
+    ->insert($aclTab)
+;
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);
 
