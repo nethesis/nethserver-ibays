@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-package esmith;
 
 use esmith::ConfigDB;
 
@@ -10,10 +9,8 @@ returns 'ACCOUNT_TOO_LONG' otherwise
 
 =cut
 
-my $ibayName = shift;
-exit 1 unless ($ibayName ne "");
-
-my $db = esmith::ConfigDB->open_ro() or exit 1;
+my $ibayName = shift || die("Missing ibay name argument");
+my $db = esmith::ConfigDB->open_ro() or die("Could not open ConfigDB");
     
 
 my $maxIbayNameLength = ($db->get('maxIbayNameLength')
@@ -23,6 +20,7 @@ my $maxIbayNameLength = ($db->get('maxIbayNameLength')
 if ( length $ibayName > $maxIbayNameLength ) {
     print "'$ibayName' is too long. Max length is: $maxIbayNameLength\n"; 
     exit 1 
-} else {
-    exit 0;
 }
+
+exit 0;
+

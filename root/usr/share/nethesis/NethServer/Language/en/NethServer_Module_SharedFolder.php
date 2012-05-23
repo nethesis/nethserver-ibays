@@ -40,3 +40,6 @@ $L['ibay-delete_failure'] = 'Some errors occured when deleting shared folder "${
 
 $L['BaseInfo_Title'] = 'General';
 $L['Permissions_Title'] = 'Permissions';
+
+$L['valid_platform,ibay-name,uniq-account,3'] = 'Shared folder name `${1}` is already registered';
+$L['valid_platform,ibay-name,ibay-length,1'] = 'Name is too long: ${reason}';
