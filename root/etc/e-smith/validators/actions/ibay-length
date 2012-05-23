@@ -18,7 +18,7 @@ my $maxIbayNameLength = ($db->get('maxIbayNameLength')
    : "") || 32;
 
 if ( length $ibayName > $maxIbayNameLength ) {
-    print "'$ibayName' is too long. Max length is: $maxIbayNameLength\n"; 
+    print "Max ibay length is: $maxIbayNameLength\n"; 
     exit 1 
 }
 
