@@ -1,9 +1,0 @@
-{
-    use esmith::AccountsDB;
-
-    $OUT = join("\n",
-	map { $_->key }
-	    grep { $_->prop('PasswordSet') eq 'yes' }
-		esmith::AccountsDB->open_ro->ibays
-	    );
-}
