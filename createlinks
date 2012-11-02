@@ -10,16 +10,15 @@ event_actions('group-delete',
     );
 
 # create
-event_actions('ibay-create', 
-	     "nethserver-ibays-ibay-create" => "15",
-	     "nethserver-ibays-set-permissions" => "20"
-    );
+event_actions('ibay-create', qw(
+	     nethserver-ibays-ibay-create 15
+	     nethserver-ibays-set-permissions 20
+));
 
 # modify
-event_actions('ibay-modify', 
-	     "nethserver-ibays-ibay-modify" => "15",
-	     "nethserver-ibays-set-permissions" => "20"
-    );
+event_actions('ibay-modify', qw(
+	     nethserver-ibays-set-permissions 20
+));
 
 # delete
 event_actions('ibay-delete', 
@@ -44,23 +43,3 @@ validator_link("uniq-account", $validator, 20);
 validator_link("ibay-length", $validator, 30);
 
 
-# Force creation of potentially empty directories
-{
-    my $perms = {
-	verbose => 1,
-	mode => 0755,
-    };
-
-    File::Path::make_path("root/etc/e-smith/skel/ibay/$_", $perms) foreach(qw{
-        cgi-bin
-        files 
-        html 
-        .AppleDesktop
-    });
-    
-    File::Path::make_path(
-	'root/etc/e-smith/skel/e-smith/files/ibays',
-	'root/home/e-smith/files/ibays',
-	$perms
-	);
-}

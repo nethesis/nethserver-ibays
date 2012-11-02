@@ -3,7 +3,7 @@
 use strict;
 
 #
-# NethServer - nethserver-ibay-conf
+# NethServer - nethserver-ibays-conf
 #
 # Copyright (C) 2012 Nethesis srl
 #
@@ -15,13 +15,14 @@ my $errors = 0;
 my $accountsDb = esmith::AccountsDB->open_ro() or die("Fatal error opening accounts DB\n");
 my $lgroupadd = '/usr/sbin/lgroupadd';
 my $lgroupmod = '/usr/sbin/lgroupmod';
+my $ibayBasePath = '/var/lib/nethserver/ibay/';
 
 #
 # Create shared group if not exists
 #
 my $gid = getgrnam('shared');
 
-if(!$gid) {
+if( ! $gid) {
     system($lgroupadd, 'shared');
 }
 
@@ -41,7 +42,7 @@ if($? != 0) {
 #
 foreach my $ibay ($accountsDb->ibays()) {
     my $ibayName = $ibay->key();
-    if ( -d "/home/e-smith/files/ibays/$ibayName" ) {
+    if ( -d $ibayBasePath . $ibayName ) {
 	next;
     }
 

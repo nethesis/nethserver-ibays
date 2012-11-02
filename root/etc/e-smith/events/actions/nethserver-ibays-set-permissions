@@ -24,14 +24,12 @@ use strict;
 use Errno;
 use File::Find;
 use esmith::util;
-use esmith::templates;
 use esmith::AccountsDB;
 
+my $ibayBasePath = '/var/lib/nethserver/ibay/';
 
-$ENV{'PATH'} = "/bin";
-
-my $event = $ARGV [0];
-my $ibayName = $ARGV [1];
+my $event = shift;
+my $ibayName = shift;
 
 die "ibayName argument missing" unless defined ($ibayName);
 
@@ -43,90 +41,55 @@ if ($ibay->prop('type') ne 'ibay') {
     die "Account $ibayName is not an ibay account; modify ibay event failed.\n"
 }
 
+my $ibayPath = $ibayBasePath . $ibayName;
 
-#------------------------------------------------------------
-# Fix permissions on ibay files.
-#------------------------------------------------------------
+my $OwningGroup = $ibay->prop('OwningGroup') ?  $ibay->prop('OwningGroup') : 'root';
+my $GroupAccess = $ibay->prop('GroupAccess') ?  $ibay->prop('GroupAccess') : 'rw';
+my $OtherAccess = $ibay->prop('OtherAccess') ?  $ibay->prop('OtherAccess') : '';
 
-#--------------------------------------------------
-# main directory is writeable only by root
-#--------------------------------------------------
 
-chdir "/home/e-smith/files/ibays/$ibayName"
-   or die "Could not chdir to /home/e-smith/files/ibays/$ibayName";
+my $basePerms = 0600;
 
-mkdir '.AppleDesktop' unless (-d '.AppleDesktop');
-
-esmith::util::chownFile("root", "root", ".");
-chmod 0755, ".";
-
-#--------------------------------------------------
-# fix ownership of subdirectories
-#--------------------------------------------------
-
-#--------------------------------------------------
-# Set the group as www if it was admin, since 
-# while set as admin, the web server no longer has
-# access to the ibay HTML directory, and web pages.
-#--------------------------------------------------
-
-my %properties = $ibay->props;
-$::group = ($properties{'Group'} eq "admin") ? "apache" : $properties {'Group'};
-
-# Make sensible defaults
-$::owner = undef;
-$::fileperm = 0600;
-$::dirperm = 0550;
-
-if ($properties {'UserAccess'} eq 'wr-admin-rd-group')
-{
-    $::owner = "admin";
-    $::fileperm = 0640;
-    $::dirperm = 02750;
+if($GroupAccess =~ /r/) {
+    $basePerms |= 040;
 }
-elsif ($properties {'UserAccess'} eq 'wr-group-rd-group')
-{
-    $::fileperm = 0660;
-    $::dirperm = 02770;
+
+if($GroupAccess =~ /w/) {
+    $basePerms |= 020;
 }
-elsif ($properties {'UserAccess'} eq 'wr-group-rd-everyone')
-{
-    $::fileperm = 0664;
-    $::dirperm = 02775;
-}
-elsif ($properties {'UserAccess'} eq 'wr-everyone-rd-everyone')
-{
-    warn("UserAccess wr-everyone-rd-everyone not implemented, falling back to wr-group-rd-everyone");
-    $::fileperm = 0664;
-    $::dirperm = 02775;
-}
-else
-{
-    warn("Value of UserAccess bad or unset");
+
+if($OtherAccess =~ /r/) {
+    $basePerms |= 04;
 }
 
 sub process
 {
-
-    if (-l)
-    {
+    if (-l) {
 	$File::Find::prune = 1;
+	return;
     }
-    else
-    {
-	esmith::util::chownFile($::owner, $::group, $_);
-	if (-d)
-	{
-	    chmod $::dirperm, $_;
-	}
-	elsif (-f)
-	{
-	    # Preserve execute permissions on files
-	    my $experm = (stat($_))[2] & 0111;
-	    $experm |= $::fileperm;
-	    chmod $experm, $_;
-	}
-    }
+
+    esmith::util::chownFile('root', $OwningGroup, $_);
+
+    my $perms = $basePerms;
+       
+    if (-d) {
+	# Set execute and set-gid bits on directories:
+	$perms |= $basePerms & 040 ? 02010 : 0; # is readable by group?
+	$perms |= $basePerms & 004 ? 1 : 0; # is readable by others?
+	$perms |= 0100; # always readable by owner (root)
+    } elsif (-f) {
+	# Preserve execute permissions on files:
+	$perms |= (stat($_))[2] & 0111;
+    } else {
+	# Skip other file types..
+	return;
+    }  
+    
+    # printf "chmod %o %s\n", $perms, $_;
+    chmod $perms, $_;
 }
 
-find(\&process,  glob("* .AppleDesktop"));
+chdir $ibayPath;
+find(\&process, $ibayPath);
+

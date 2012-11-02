@@ -25,11 +25,11 @@
 
 event=$1
 ibay=$2
-if [ -z "$ibay" ]
-then
-    echo ibayName argument missing
+
+if [ -z "$ibay" ]; then
+    echo ibay name argument missing
     exit 1
 fi
 
-/bin/rm -rf /home/e-smith/files/ibays/$ibay
-exec /usr/sbin/luserdel "$ibay"
+/bin/rm -rf "/var/lib/nethserver/ibay/${ibay:-xxx}"
+
