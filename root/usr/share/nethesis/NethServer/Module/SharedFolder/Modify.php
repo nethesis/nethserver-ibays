@@ -48,95 +48,19 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         $parameterSchema = array(
             array('ibay', $ibayNameValidator, Table::KEY),
-            array('Name', Validate::ANYTHING, Table::FIELD),
-            array('Group', Validate::USERNAME, Table::FIELD),
-            
-            array('UserAccess', false, Table::FIELD), //possibile values: global|global-pw|global-pw-remote|local|local-pw|none
-            array('PublicAccess', false, Table::FIELD), //possibile values: wr-admin-rd-group|wr-group-rd-everyone|wr-group-rd-group
-            array('access', '/global|local/', null), // do not map on any datasource
-            array('local_password', '/^(pw|)$/', null),
-            array('global_password', '/^(pw|pw-remote|)$/', null),
-            array('read', '/^(admin|group|everyone)$/', null),
-            array('write', '/^(admin|group|everyone)$/', null),
+            array('Description', Validate::ANYTHING, Table::FIELD),
+            array('OwningGroup', Validate::USERNAME, Table::FIELD),
             array('OwnersDatasource', false, null),
+            array('GroupAccess', '/^rw?$/', Table::FIELD),
+            array('OtherAccess', '/^r?$/', Table::FIELD),
             array('AclRead', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclRead', ','), // ACL
             array('AclWrite', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclWrite', ','), // ACL
             array('AclSubjects', FALSE, null),
         );
 
         $this->setSchema($parameterSchema);
+        $this->setDefaultValue('Removable', 'yes');
         parent::initialize();
-    }
-
-    private function composeUserAccess()
-    {
-        return sprintf("wr-%s-rd-%s", $this->parameters['write'], $this->parameters['read']);
-    }
-
-    private function assignUserAccess($value)
-    {
-        if (is_null($value)) {
-            // default values
-            $this->parameters['read'] = 'everyone';
-            $this->parameters['write'] = 'everyone';
-        } else {
-            $parts = explode('-', $value);
-            $this->parameters['read'] = $parts[3];
-            $this->parameters['write'] = $parts[1];
-        }
-    }
-
-    private function composePublicAccess()
-    {
-        $value = $this->parameters['access'];
-
-        if ($value == 'local' && $this->parameters['local_password']) {
-            $value .= '-' . $this->parameters['local_password'];
-        } elseif ($value == 'global' && $this->parameters['global_password']) {
-            $value .= '-' . $this->parameters['global_password'];
-        }
-
-        return $value;
-    }
-
-    private function assignPublicAccess($value)
-    {
-        if (is_null($value)) {
-            // default values
-            $this->parameters['access'] = 'local';
-            $this->parameters['local_password'] = '';
-            $this->parameters['global_password'] = '';
-            $value = $this->composePublicAccess();
-        } else {
-            $parts = explode('-', $value, 2);
-            if ($parts[0] == 'local') {
-                $this->parameters['access'] = 'local';
-                $this->parameters['local_password'] = isset($parts[1]) ? $parts[1] : '';
-                $this->parameters['global_password'] = NULL;
-            } elseif ($parts[0] == 'global') {
-                $this->parameters['access'] = 'global';
-                $this->parameters['local_password'] = NULL;
-                $this->parameters['global_password'] = isset($parts[1]) ? $parts[1] : '';
-            }
-        }
-    }
-
-    public function bind(\Nethgui\Controller\RequestInterface $request)
-    {
-        parent::bind($request);
-        if ($request->isMutation()) {
-            if ($this->getIdentifier() !== "delete") { //do not set props if we are deleting the ibay
-                $this->parameters['UserAccess'] = $this->composeUserAccess();
-                $this->parameters['PublicAccess'] = $this->composePublicAccess();
-            }
-        } else {
-            $this->assignPublicAccess($this->parameters['PublicAccess']);
-            $this->assignUserAccess($this->parameters['UserAccess']);
-
-            if ( ! isset($this->parameters['Group'])) {
-                $this->parameters['Group'] = 'shared';
-            }
-        }
     }
 
     protected function onParametersSaved($changedParameters)
@@ -145,16 +69,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if ($action == 'update') {
             $action = 'modify';
         }
-        $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $action), array(array($this, 'provideIbayName')));
-    }
-
-    /**
-     * This callback function provides the argument for smedb events
-     * @return string
-     */
-    public function provideIbayName()
-    {
-        return $this->getRequest()->getParameter('ibay');
+        $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $action), array($this->parameters['ibay']));
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
@@ -167,8 +82,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
 
-        $owners = array(array('shared', 'Everyone'), array('admin', 'Administrator'));
-        $subjects = array(array('shared', 'Everyone'));
+        $owners = array(array('shared', 'Authenticated users'));
+        $subjects = array(array('shared', 'Authenticated users'));
 
         foreach ($this->getPlatform()->getDatabase('accounts')->getAll('group') as $keyName => $props) {
             $entry = array($keyName, sprintf("%s (%s)", $props['Description'], $keyName));
@@ -176,7 +91,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $subjects[] = $entry;
         }
 
-        $view['OwnersDatasource'] = $owners;
+        $view['OwningGroupDatasource'] = $owners;
 
         foreach ($this->getPlatform()->getDatabase('accounts')->getAll('user') as $keyName => $props) {
             $entry = array($keyName, sprintf("%s (%s)", trim($props['FirstName'] + ' ' + $props['LastName']), $keyName));

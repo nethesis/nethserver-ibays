@@ -1,4 +1,6 @@
 <?php
+
+/* @var $view \Nethgui\Renderer\Xhtml */
 $view->requireFlag($view::INSET_FORM);
 
 if ($view->getModule()->getIdentifier() == 'update') {
@@ -12,22 +14,11 @@ if ($view->getModule()->getIdentifier() == 'update') {
 echo $view->header('ibay')->setAttribute('template', $view->translate($template));
 $baseTab = $view->panel()->setAttribute('name', "BaseInfo")
     ->insert($view->textInput('ibay', $keyFlags))
-    ->insert($view->textInput('Name'))
+    ->insert($view->textInput('Description'))
+    ->insert($view->selector('OwningGroup', $view::SELECTOR_DROPDOWN))
+    ->insert($view->checkBox('GroupAccess', 'rw')->setAttribute('uncheckedValue', 'r'))
+    ->insert($view->checkBox('OtherAccess', 'r')->setAttribute('uncheckedValue', ''))
 ;
-
-$permissionTab = $view->panel()->setAttribute('name', 'Permissions')
-    ->insert($view->selector('Group', $view::SELECTOR_DROPDOWN)->setAttribute('choices', 'OwnersDatasource'))
-    ->insert($view->columns()
-    ->insert($view->fieldset()->setAttribute('template', 'Read permissions') //->setAttribute('icon-before', 'ui-icon-folder-open')
-        ->insert($view->radioButton('read', 'admin'))
-        ->insert($view->radioButton('read', 'group'))
-        ->insert($view->radioButton('read', 'everyone')))
-    ->insert($view->fieldset()->setAttribute('template', 'Write permissions') //->setAttribute('icon-before', 'ui-icon-locked')->setAttribute('icon-before', 'ui-icon-disk')
-        ->insert($view->radioButton('write', 'admin'))
-        ->insert($view->radioButton('write', 'group'))
-        ->insert($view->radioButton('write', 'everyone')))
-);
-
 
 $aclTab = $view->panel()->setAttribute('name', "Acl")
     ->insert($view->objectPicker()
@@ -37,7 +28,7 @@ $aclTab = $view->panel()->setAttribute('name', "Acl")
 );
 
 echo $view->tabs()
-    ->insert($baseTab->insert($view->literal($permissionTab)))
+    ->insert($baseTab)
     ->insertPlugins()
     ->insert($aclTab)
 ;

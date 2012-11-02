@@ -37,7 +37,7 @@ class SharedFolder extends \Nethgui\Controller\TableController
     {
         $columns = array(
             'Key',
-            'Name',
+            'Description',
             'Actions'
         );
 
