@@ -82,8 +82,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
 
-        $owners = array(array('shared', 'Authenticated users'));
-        $subjects = array(array('shared', 'Authenticated users'));
+        $owners = array(array('shared', $view->translate('Authenticated users')));
+        $subjects = array(array('shared', $view->translate('Authenticated users')));
 
         foreach ($this->getPlatform()->getDatabase('accounts')->getAll('group') as $keyName => $props) {
             $entry = array($keyName, sprintf("%s (%s)", $props['Description'], $keyName));
@@ -94,7 +94,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view['OwningGroupDatasource'] = $owners;
 
         foreach ($this->getPlatform()->getDatabase('accounts')->getAll('user') as $keyName => $props) {
-            $entry = array($keyName, sprintf("%s (%s)", trim($props['FirstName'] + ' ' + $props['LastName']), $keyName));
+            $entry = array($keyName, sprintf("%s (%s)", trim($props['FirstName'] . ' ' . $props['LastName']), $keyName));
             $subjects[] = $entry;
         }
 
