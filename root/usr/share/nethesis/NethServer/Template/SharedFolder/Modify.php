@@ -23,6 +23,7 @@ $baseTab = $view->panel()->setAttribute('name', "BaseInfo")
 $aclTab = $view->panel()->setAttribute('name', "Acl")
     ->insert($view->objectPicker()
     ->setAttribute('objects', 'AclSubjects')
+    ->setAttribute('objectLabel', 1)
     ->insert($view->checkBox('AclRead', FALSE, $view::STATE_CHECKED))
     ->insert($view->checkBox('AclWrite', FALSE))
 );
