@@ -53,9 +53,7 @@ class SharedFolder extends \Nethgui\Controller\TableController
     }
 
     /**
-     * Refs #941 - Primary i-bay deletion
-     * 
-     * Primary ibay cannot be deleted. Honour "Removable=no" prop.
+     * Honour "Removable=no" prop.
      * 
      * @param \Nethgui\Controller\Table\Read $action
      * @param \Nethgui\View\ViewInterface $view

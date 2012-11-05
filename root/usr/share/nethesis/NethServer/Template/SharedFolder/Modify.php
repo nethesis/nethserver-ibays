@@ -5,10 +5,10 @@ $view->requireFlag($view::INSET_FORM);
 
 if ($view->getModule()->getIdentifier() == 'update') {
     $keyFlags = $view::STATE_DISABLED;
-    $template = 'Edit shared folder `${0}`';
+    $template = 'Update_Header';
 } else {
     $keyFlags = 0;
-    $template = 'Create a new shared folder';
+    $template = 'Create_Header';
 }
 
 echo $view->header('ibay')->setAttribute('template', $view->translate($template));

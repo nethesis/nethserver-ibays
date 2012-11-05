@@ -5,6 +5,9 @@
 $L['SharedFolder_Title'] = 'Shared Folders';
 $L['SharedFolder_Description'] = 'Share folders and files between users and groups';
 
+$L['Create_Header'] = 'Create a new shared folder';
+$L['Update_Header'] = 'Edit shared folder `${0}`';
+
 $L['BaseInfo_Title'] = 'General';
 $L['Acl_Title'] = 'ACL';
 $L['ibay_label'] = 'Name';
@@ -16,5 +19,5 @@ $L['AclRead_label'] = 'Read';
 $L['AclWrite_label'] = 'Write';
 $L['Authenticated users'] = 'Authenticated users';
 
-$L['valid_platform,ibay-name,uniq-account,3'] = 'Shared folder name `${1}` is already registered';
-$L['valid_platform,ibay-name,ibay-length,1'] = 'Name is too long: ${reason}';
+$L['valid_platform,ibay-create,uniq-account,3'] = 'An account with the same name already exists';
+$L['valid_platform,ibay-create,ibay-length,1'] = 'Name too long';
