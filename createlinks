@@ -38,8 +38,13 @@ event_actions('user-create',
 #--------------------------------------------------
 # actions for ibay-name validator
 #--------------------------------------------------
-my $validator = 'ibay-name';
-validator_link("uniq-account", $validator, 20);
-validator_link("ibay-length", $validator, 30);
+validator_actions('ibay-create', qw(
+                  uniq-account 20
+                  ibay-length 30
+));
+
+validator_actions('ibay-delete', qw(
+                  ibay-removable 20
+));
 
 

@@ -34,16 +34,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
     public function initialize()
     {
         /*
-         * Refs #941. Avoid deletion of Primary ibay
+         * Refs #941, #1536. Avoid deletion of Primary ibay
          */
         if ($this->getIdentifier() === 'delete') {
-            $ibayNameValidator = $this->createValidator(Validate::USERNAME);
+            $ibayNameValidator = $this->createValidator(Validate::USERNAME)->platform('ibay-delete');
         } elseif ($this->getIdentifier() === 'create') {
-            $ibayNameValidator = $this->createValidator(Validate::USERNAME)->platform('ibay-name');
+            $ibayNameValidator = $this->createValidator(Validate::USERNAME)->platform('ibay-create');
         } else {
-            $ibayNameValidator = $this->createValidator()->orValidator(
-                $this->createValidator(Validate::USERNAME), $this->createValidator()->equalTo('Primary')
-            );
+            $ibayNameValidator = FALSE;
         }
 
         $parameterSchema = array(
@@ -55,11 +53,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('OtherAccess', '/^r?$/', Table::FIELD),
             array('AclRead', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclRead', ','), // ACL
             array('AclWrite', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclWrite', ','), // ACL
-            array('AclSubjects', FALSE, null),
+            array('AclSubjects', FALSE, null),            
         );
 
         $this->setSchema($parameterSchema);
-        $this->setDefaultValue('Removable', 'yes');
         parent::initialize();
     }
 

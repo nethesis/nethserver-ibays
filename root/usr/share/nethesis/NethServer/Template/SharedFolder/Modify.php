@@ -4,7 +4,7 @@
 $view->requireFlag($view::INSET_FORM);
 
 if ($view->getModule()->getIdentifier() == 'update') {
-    $keyFlags = $view::STATE_READONLY;
+    $keyFlags = $view::STATE_DISABLED;
     $template = 'Edit shared folder `${0}`';
 } else {
     $keyFlags = 0;
