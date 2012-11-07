@@ -27,11 +27,23 @@ event_actions('ibay-delete',
 	     'nethserver-ibays-ibay-delete' => '15'
     );
 
+
+# Synchronize httpd configuration on ibay-change events:
+foreach (qw(
+    ibay-create
+    ibay-delete
+    ibay-modify
+)) {
+    event_templates($_, qw(/etc/httpd/conf/httpd.conf));
+    event_services($_, qw(httpd reload)));
+}
+
 # package install/update
-event_actions('nethserver-ibays-update',
-	     'initialize-default-databases' => '00',
-	     'nethserver-ibays-conf' => '30'
-    );
+event_actions('nethserver-ibays-update', qw(
+	     initialize-default-databases 00
+	     nethserver-ibays-conf 30
+             nethserver-ibays-set-password 40
+));
 
 # user create: add to "shared" group
 event_actions('user-create',
