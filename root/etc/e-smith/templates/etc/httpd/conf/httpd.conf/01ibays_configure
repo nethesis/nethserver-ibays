@@ -45,7 +45,7 @@
 
 	my $ibayConf = {
 	    'Name' => $ibayName,
-	    'Path' => '/var/lib/nethserver/ibay/' . $ibayName . '/',
+	    'Path' => '/var/lib/nethserver/ibay/' . $ibayName,
 	    'Description' => $ih{Description},
 	    'Access' => $ih{HttpAccess},
 	    'PrivateAllow' => $localNetworks,

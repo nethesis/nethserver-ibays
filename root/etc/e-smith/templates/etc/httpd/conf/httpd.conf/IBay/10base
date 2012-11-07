@@ -33,6 +33,6 @@ PASSWORD
      $OUT;
 }</Directory>
 
-Alias /{$Name}/ "{$Path}"
+Alias "/{$Name}" "{$Path}"
 
 
