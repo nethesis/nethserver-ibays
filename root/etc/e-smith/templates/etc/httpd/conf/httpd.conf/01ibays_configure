@@ -7,6 +7,7 @@
     push @modules, qw(
        auth_basic
        authn_file
+       authz_user
     );
 
     # The list of ibays shared among all vhosts:
