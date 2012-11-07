@@ -1,6 +1,6 @@
 {
     #
-    # 10base -- basic ibay setup
+    # 10directory_begin -- basic ibay directory setup
     #
 }<Directory {$Path}>
     Options None
@@ -31,8 +31,6 @@ PASSWORD
 	}
 
      $OUT;
-}</Directory>
-
-Alias "/{$Name}" "{$Path}"
+}
 
 

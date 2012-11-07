@@ -11,7 +11,7 @@
     );
 
     # The list of ibays shared among all vhosts:
-    @ibays_any = ();
+    @ibays = ();
     
     use esmith::AccountsDB; 
     use esmith::NetworksDB;
@@ -23,7 +23,7 @@
     my $localNetworks = join ' ', map { 
 	my $u = $_; 
 	$u =~ s:/255\.255\.255\.255::g; 
-	$u 
+	$u;
     } $networksDb->local_access_spec;
 
     foreach my $ibayName (sort map {$_->key} $accountsDb->ibays) {
@@ -50,7 +50,8 @@
 	    'Access' => $ih{HttpAccess},
 	    'PrivateAllow' => $localNetworks,
 	    'PasswordStatus' => $ih{HttpPasswordStatus},
-	    'CgiBinStatus' => $ih{HttpCgiBinStatus}
+	    'CgiBinStatus' => $ih{HttpCgiBinStatus},
+	    'ServerName' => $vhostName,
 	};
 
 	if($ih{HttpAliasType} eq 'default') {
@@ -60,7 +61,6 @@
 	    $ibayConf->{Alias} = $ih{HttpAliasCustom};
 
  	} elsif($ih{HttpAliasType} eq 'root') {
-
 	    if($vhostName eq '__ANY__') {
 		# Set the defaultDocumentRoot template variable:
 		$defaultDocumentRoot = $ibayConf->{Path};
@@ -73,9 +73,7 @@
 	    next;
 	}
 
-	if($vhostName eq '__ANY__') {
-	    push @ibays_any, $ibayConf;
-	}
+	push @ibays, $ibayConf;
     }
 
     '';
