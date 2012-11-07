@@ -13,11 +13,13 @@ event_actions('group-delete',
 event_actions('ibay-create', qw(
 	     nethserver-ibays-ibay-create 15
 	     nethserver-ibays-set-permissions 20
+             nethserver-ibays-set-password 30
 ));
 
 # modify
 event_actions('ibay-modify', qw(
 	     nethserver-ibays-set-permissions 20
+             nethserver-ibays-set-password 30
 ));
 
 # delete

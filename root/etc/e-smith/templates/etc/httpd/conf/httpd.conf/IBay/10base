@@ -20,8 +20,10 @@ ACCESS
 	}
 
 	if($PasswordStatus eq 'enabled') {
+	    my $authName = $Description || $Name;
 	    $OUT .= <<PASSWORD
     AuthType Basic
+    AuthName "$authName"
     AuthUserFile conf/ibays.htpasswd
     Require user $Name
     Satisfy Any
