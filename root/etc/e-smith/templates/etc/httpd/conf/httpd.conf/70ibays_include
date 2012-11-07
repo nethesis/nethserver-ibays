@@ -1,0 +1,29 @@
+#
+# 70ibays_include -- include .ibay templates under nethserver.d/
+#
+Include nethserver.d/*.ibay
+{
+    # 
+    # expand IBay templates
+    #
+
+    use esmith::templates;
+    my $outDir = '/etc/httpd/nethserver.d/';
+
+    # Clean up .ibay files
+    unlink glob $outDir . '*.ibay';
+
+    foreach my $ibayConf (@ibays_any) {
+	my $output = esmith::templates::processTemplate({
+	    MORE_DATA => $ibayConf,
+	    TEMPLATE_PATH => '/etc/httpd/conf/httpd.conf/IBay',
+	    OUTPUT_TYPE => 'file',
+	    OUTPUT_PREFIX => $outDir,
+	    OUTPUT_FILENAME => $ibayConf->{Name} . '.ibay'
+	});
+    }
+
+    '';
+}
+
+

@@ -1,0 +1,36 @@
+{
+    #
+    # 10base -- basic ibay setup
+    #
+}<Directory {$Path}>
+    Options None
+    Options +Indexes
+    Options +Includes
+    AllowOverride None 
+{      
+	if($Access eq 'private') {
+	    my $access = join(" \\\n        ", split(' ', $PrivateAllow));
+	    $OUT = <<ACCESS
+    Order Deny,Allow
+    Deny from all
+    Allow from $access
+ACCESS
+	} else {
+	    $OUT = '';
+	}
+
+	if($PasswordStatus eq 'enabled') {
+	    $OUT .= <<PASSWORD
+    AuthType Basic
+    AuthUserFile conf/ibays.htpasswd
+    Require user $Name
+    Satisfy Any
+PASSWORD
+	}
+
+     $OUT;
+}</Directory>
+
+Alias /{$Name}/ "{$Path}"
+
+
