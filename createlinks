@@ -35,7 +35,7 @@ foreach (qw(
     ibay-modify
 )) {
     event_templates($_, qw(/etc/httpd/conf/httpd.conf));
-    event_services($_, qw(httpd reload)));
+    event_services($_, qw(httpd reload));
 }
 
 # package install/update
