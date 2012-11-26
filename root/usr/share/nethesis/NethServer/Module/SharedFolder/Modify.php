@@ -53,7 +53,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('OtherAccess', '/^r?$/', Table::FIELD),
             array('AclRead', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclRead', ','), // ACL
             array('AclWrite', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclWrite', ','), // ACL
-            array('AclSubjects', FALSE, null),            
+            array('AclSubjects', FALSE, null),
         );
 
         $this->setSchema($parameterSchema);
@@ -96,6 +96,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
 
         $view['AclSubjects'] = $subjects;
+
+        $view['reset-permissions'] = $view->getModuleUrl('../reset-permissions/' . $this->getAdapter()->getKeyValue());
     }
 
 }

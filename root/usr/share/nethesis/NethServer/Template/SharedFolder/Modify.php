@@ -34,5 +34,17 @@ echo $view->tabs()
     ->insert($aclTab)
 ;
 
-echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);
+$buttons = $view->buttonList()
+    ->insert($view->button('Submit', $view::BUTTON_SUBMIT))
+;
 
+if ($keyFlags !== 0) {
+    $buttons->insert($view->button('reset-permissions', $view::BUTTON_LINK));
+}
+
+$buttons
+    ->insert($view->button('Cancel', $view::BUTTON_CANCEL))
+    ->insert($view->button('Help', $view::BUTTON_HELP))
+;
+
+echo $buttons;

@@ -25,6 +25,11 @@ event_actions('ibay-delete',
 	     'nethserver-ibays-ibay-delete' => '15'
     );
 
+# modify
+event_actions('ibay-reset-permissions', qw(
+	     nethserver-ibays-set-permissions 20
+));
+
 # package install/update
 event_actions('nethserver-ibays-update', qw(
 	     initialize-default-databases 00

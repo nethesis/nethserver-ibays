@@ -47,6 +47,7 @@ class SharedFolder extends \Nethgui\Controller\TableController
             ->addTableActionPluggable(new SharedFolder\Modify('create'))
             ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
             ->addRowActionPluggable(new SharedFolder\Modify('update'))
+            ->addRowAction(new SharedFolder\ResetPermissions())
             ->addRowAction(new SharedFolder\Modify('delete'))
         ;
         parent::initialize();

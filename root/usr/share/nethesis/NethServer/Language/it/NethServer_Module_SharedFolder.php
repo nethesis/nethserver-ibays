@@ -21,3 +21,7 @@ $L['Authenticated users'] = 'Utenti autenticati';
 
 $L['valid_platform,ibay-create,uniq-account,3'] = 'C\'è già un account con questo nome';
 $L['valid_platform,ibay-create,ibay-length,1'] = 'Nome troppo lungo';
+
+$L['reset-permissions_label'] = 'Reimposta permessi';
+$L['reset-permissions_Header'] = 'Reimposta i permessi per la cartella `${0}`';
+$L['reset-permissions_Message'] = 'Assegna i permessi di default per file e sotto-cartelle della cartella condivisa `${0}`?';
