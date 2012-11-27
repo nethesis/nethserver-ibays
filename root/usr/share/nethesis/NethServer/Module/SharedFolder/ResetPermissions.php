@@ -21,7 +21,7 @@ namespace NethServer\Module\SharedFolder;
  */
 
 /**
- * TODO: add component description here
+ * Trigger ibay-reset-permissions event
  *
  * @author Davide Principi <davide.principi@nethesis.it>
  * @since 1.0

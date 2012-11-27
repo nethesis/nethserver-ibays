@@ -24,4 +24,4 @@ $L['valid_platform,ibay-create,ibay-length,1'] = 'Name too long';
 
 $L['reset-permissions_label'] = 'Reset permissions';
 $L['reset-permissions_Header'] = 'Reset permissions on folder `${0}`';
-$L['reset-permissions_Message'] = 'Assign default permissions on files and sub-folder of shared folder `${0}`?';
+$L['reset-permissions_Message'] = 'Reset permissions to default value on files and sub-folder of shared folder `${0}`?';

@@ -24,4 +24,4 @@ $L['valid_platform,ibay-create,ibay-length,1'] = 'Nome troppo lungo';
 
 $L['reset-permissions_label'] = 'Reimposta permessi';
 $L['reset-permissions_Header'] = 'Reimposta i permessi per la cartella `${0}`';
-$L['reset-permissions_Message'] = 'Assegna i permessi di default per file e sotto-cartelle della cartella condivisa `${0}`?';
+$L['reset-permissions_Message'] = 'Reimposta i permessi al valore di default per file e sotto-cartelle della cartella condivisa `${0}`?';
