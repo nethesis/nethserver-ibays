@@ -28,6 +28,11 @@ namespace NethServer\Module\SharedFolder;
  */
 class ResetPermissions extends \Nethgui\Controller\Table\AbstractAction
 {
+    /**
+     * The selected ibay identifier
+     *
+     * @var string
+     */
     private $key;
 
     public function __construct()
@@ -43,11 +48,11 @@ class ResetPermissions extends \Nethgui\Controller\Table\AbstractAction
 
         /* @var $tableAdapter \ArrayInterface */
         $tableAdapter = $this->getAdapter();
+
+        // Check if the ibay identifier is set:
         if ( ! isset($tableAdapter[$this->key])) {
             throw new \Nethgui\Exception\HttpException('Not found', 404, 1353949626);
         }
-
-        $this->parameters['ibay'] = $this->key;
     }
 
     public function process()
@@ -57,4 +62,9 @@ class ResetPermissions extends \Nethgui\Controller\Table\AbstractAction
         }
     }
 
+    public function prepareView(\Nethgui\View\ViewInterface $view)
+    {
+        parent::prepareView($view);
+        $view['ibay'] = $this->key;
+    }
 }
