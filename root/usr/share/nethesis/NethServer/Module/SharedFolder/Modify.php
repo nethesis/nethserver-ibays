@@ -67,6 +67,17 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $action = 'modify';
         }
         $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $action), array($this->parameters['ibay']));
+
+        // Reset permissions if one of the following fields was modified (refs #1548):
+        if (count(array_intersect(array(
+                    'OwningGroup',
+                    'GroupAccess',
+                    'OtherAccess',
+                    'AclRead',
+                    'AclWrite'
+                    ), $changedParameters)) > 0) {
+            $this->getPlatform()->signalEvent(sprintf('ibay-reset-permissions@post-process', $action), array($this->parameters['ibay']));
+        }
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
