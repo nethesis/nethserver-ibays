@@ -25,6 +25,7 @@ use Errno;
 use File::Find;
 use esmith::util;
 use esmith::AccountsDB;
+use Data::Dumper;
 
 my $ibayBasePath = '/var/lib/nethserver/ibay/';
 
@@ -33,8 +34,8 @@ my $ibayName = shift;
 
 die "ibayName argument missing" unless defined ($ibayName);
 
-my $accountdb = esmith::AccountsDB->open();
-my $ibay = $accountdb->get($ibayName) or 
+my $accountsDb = esmith::AccountsDB->open();
+my $ibay = $accountsDb->get($ibayName) or 
 	die "Couldn't find $ibayName record in accounts db\n";
 
 if ($ibay->prop('type') ne 'ibay') {
@@ -46,7 +47,8 @@ my $ibayPath = $ibayBasePath . $ibayName;
 my $OwningGroup = $ibay->prop('OwningGroup') ?  $ibay->prop('OwningGroup') : 'root';
 my $GroupAccess = $ibay->prop('GroupAccess') ?  $ibay->prop('GroupAccess') : 'rw';
 my $OtherAccess = $ibay->prop('OtherAccess') ?  $ibay->prop('OtherAccess') : '';
-
+my @AclRead = $ibay->prop('AclRead') ? split(',', $ibay->prop('AclRead')) : '';
+my @AclWrite = $ibay->prop('AclWrite') ? split(',', $ibay->prop('AclWrite')) : '';
 
 my $basePerms = 0600;
 
@@ -61,6 +63,42 @@ if($GroupAccess =~ /w/) {
 if($OtherAccess =~ /r/) {
     $basePerms |= 04;
 }
+
+sub prepareAcls
+{
+    # initialize for builtin group "shared"
+    my %p = ( 'shared' => 1 );
+
+    # first bit: is user or group?
+    $p{$_->key} = 0 foreach ($accountsDb->users); 
+    $p{$_->key} = 1 foreach ($accountsDb->groups);
+
+    # 2nd bit: has write access?
+    foreach my $user (@AclWrite) {
+	next if( ! defined $p{$user});
+	$p{$user} |= 2;
+    }
+
+    # 3rd bit: has read access?
+    foreach my $user (@AclRead) {
+	next if( ! defined $p{$user});
+	$p{$user} |= 4;
+    }
+
+    return map { join(':', 
+		      ($p{$_} & 1) ? 'g' : 'u',     # is user or group
+		      $_, 
+		      (($p{$_} & 4) ? 'r' : '') .   # has read access
+		      (($p{$_} & 2) ? 'w' : '') .   # has write access
+		      'X'                           # conditional eXecute bit (see manpage setfacl)
+		     ) } grep { $p{$_} > 1 } keys %p;
+
+}
+
+my @acls = prepareAcls();
+
+# open a pipe to setfacl and pass the file list to it:
+open(my $psetfacl, '| /usr/bin/setfacl -b ' . ( @acls ? ('-m ' . join(',', @acls)) : '') . ' - ') || die('setfacl error: ' . $!);
 
 sub process
 {
@@ -84,12 +122,17 @@ sub process
     } else {
 	# Skip other file types..
 	return;
-    }  
+    }
     
     # printf "chmod %o %s\n", $perms, $_;
     chmod $perms, $_;
+
+    # send the file full path into the pipe:
+    print $psetfacl $File::Find::name . "\n";
 }
 
 chdir $ibayPath;
 find(\&process, $ibayPath);
+close($psetfacl);
+
 
