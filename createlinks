@@ -44,7 +44,7 @@ validator_actions('ibay-create', qw(
 ));
 
 validator_actions('ibay-delete', qw(
-                  ibay-removable 20
+                  record-removable 20
 ));
 
 
