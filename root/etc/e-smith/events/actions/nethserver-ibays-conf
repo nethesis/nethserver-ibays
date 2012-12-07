@@ -13,17 +13,17 @@ use esmith::event;
 
 my $errors = 0;
 my $accountsDb = esmith::AccountsDB->open_ro() or die("Fatal error opening accounts DB\n");
-my $lgroupadd = '/usr/sbin/lgroupadd';
+my $luseradd = '/usr/sbin/luseradd';
 my $lgroupmod = '/usr/sbin/lgroupmod';
 my $ibayBasePath = '/var/lib/nethserver/ibay/';
 
 #
 # Create shared group if not exists
 #
-my $gid = getgrnam('shared');
+my $uid = getpwnam('shared');
 
-if( ! $gid) {
-    system($lgroupadd, 'shared');
+if( ! $uid) {
+    qx($luseradd -s /bin/false -r shared);
 }
 
 my @users = map { $_->key } $accountsDb->users();
