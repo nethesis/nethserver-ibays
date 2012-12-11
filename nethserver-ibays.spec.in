@@ -8,19 +8,12 @@ Source: %{name}-%{version}.tar.gz
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
 Requires: nethserver-directory
-Requires: nethserver-base >= 6.1.2
-BuildRequires: perl, perl(File::Path), nethserver-devtools >= 2.3.3
+Requires: nethserver-base
+BuildRequires: perl, perl(File::Path), nethserver-devtools
 
 %description 
 Information-bays (ibays) are filesystem directories accessible through
 services provided by other packages, such as Samba, Sftp, Http
-
-%changelog
-* Tue Feb  7 2012 Davide <davidep@davidep1.nethesis.it> - 2.3.0-2.nh
-- Added nethserver-base requirement >= 6.0.0
-
-* Wed Sep 28 2011 Giacomo Sanchietti <giacomo.snchietti@gmail.com> 2.3.0-1.nh
-- First Nethserver release
 
 %prep
 %setup
@@ -44,3 +37,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
+
+%changelog
+
