@@ -21,9 +21,7 @@
 #
 
 use strict;
-use NethServer::Migrate qw(migrateDir);
 use esmith::AccountsDB;
-use esmith::ConfigDB;
 use esmith::event;
 
 my $event = shift;
@@ -35,13 +33,6 @@ if( ! $event ) {
     die("Missing event argument!\n");
 }
 
-if( ! $sourceDir ) {
-    die("Missing sourceDir argument!\n");
-}
-
-
-my $srcConfigDb = esmith::ConfigDB->open_ro(join('', $sourceDir, $esmithDbDir, '/configuration')) or die("Could not open source configuration database in $sourceDir \n");
-my $dstConfigDb = esmith::ConfigDB->open('configuration') or die("Could not open configuration account db\n");
 
 my $srcAccountsDb = esmith::AccountsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/accounts')) or die("Could not open source accounts database in $sourceDir \n");
 my $dstAccountsDb = esmith::AccountsDB->open('accounts') or die("Could not open destination account db\n");
@@ -75,48 +66,17 @@ foreach my $srcIbay ($srcAccountsDb->ibays()) {
 		       $accessMap{$srcIbay->prop('UserAccess')} : $accessMap{default}};
 
     $dstIbay->merge_props(
-	Description => $srcIbay->prop('Name'), 
+	$isCreated ? ('__new' => '1') : (),  # mark as a new record
+	Description => join(' ', $srcIbay->prop('Name'), '[migration]'),
 	OwningGroup => $srcIbay->prop('Group'),	
 	AclRead => '',
 	AclWrite => '',
 	%access);
-
-    my $eventName = $isCreated ? 'ibay-create' : 'ibay-modify';
-    if( ! esmith::event::event_signal($eventName, $ibayName)) {
-	warn("[ERROR] $eventName $ibayName event failed\n");
-	$errors++;
-	next;
-    }
-
-    # Migrate data
-    if( ! migrateDir(
-	$sourceDir . '/home/e-smith/files/ibays/' . $ibayName, 
-	'/var/lib/nethserver/ibay/' . $ibayName
-	)) {
-	warn("[ERROR] failed to migrate $ibayName ibay directory.\n");
-	$errors++;
-	next;
-    }
-
-    if( ! esmith::event::event_signal('ibay-reset-permissions', $ibayName)) {
-	warn("[ERROR] ibay-reset-permissions $ibayName event failed\n");
-	$errors++;
-	next;
-    }
 	
 }
 
-# Restore ACLs
-chdir '/var/lib/nethserver/ibay/';
-system('/usr/bin/setfacl', '--restore=' . $sourceDir . '/home/e-smith/db/acls.dump');
-if($? != 0) {
-    warn("[ERROR] failed to restore POSIX ACLs\n");
-    $errors++;
-}
-
-
 if($errors > 0) {
-    warn "[WARNING] $errors error(s) occurred in nethserver-samba-migrate action\n";
+    warn "[WARNING] $errors error(s) occurred in $0 action\n";
     exit(1);
 }
 

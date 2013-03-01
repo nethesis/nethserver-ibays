@@ -72,5 +72,6 @@ validator_actions('ibay-delete', qw(
 # migration-import event (refs #1688)
 #
 event_actions('migration-import', qw(
-    nethserver-ibays-migrate 30
+    nethserver-ibays-migrate-begin  30
+    nethserver-ibays-migrate-commit 60
 ));
