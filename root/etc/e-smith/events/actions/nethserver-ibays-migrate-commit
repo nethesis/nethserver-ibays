@@ -55,16 +55,22 @@ foreach my $ibay ($accountsDb->ibays()) {
 	$ibay->delete_prop('__new');
     }
 
-    # Migrate data
-    if( ! migrateDir(
-	$sourceDir . '/home/e-smith/files/ibays/' . $ibayName, 
-	'/var/lib/nethserver/ibay/' . $ibayName
-	)) {
-	warn("[ERROR] failed to migrate $ibayName ibay directory.\n");
-	$errors++;
+    # Skip data migration,  if destination exists:
+    if( -d  '/var/lib/nethserver/ibay/' . $ibayName) {
+	warn "[WARNING] $ibayName: ibay directory exists. Data migration skipped.\n";
 	next;
     }
 
+    # Migrate data
+    if( ! migrateDir(
+	      $sourceDir . '/home/e-smith/files/ibays/' . $ibayName, 
+	      '/var/lib/nethserver/ibay/' . $ibayName
+	)) {
+	    warn("[ERROR] failed to migrate $ibayName ibay directory.\n");
+	    $errors++;
+	    next;
+    }
+    
     if( ! esmith::event::event_signal('ibay-reset-permissions', $ibayName)) {
 	warn("[ERROR] ibay-reset-permissions $ibayName event failed\n");
 	$errors++;
