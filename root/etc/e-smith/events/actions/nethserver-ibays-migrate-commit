@@ -38,11 +38,17 @@ if( ! $sourceDir ) {
     die("Missing sourceDir argument!\n");
 }
 
-my $accountsDb = esmith::AccountsDB->open('accounts') or die("Could not open accounts db\n");
+my $srcAccountsDb = esmith::AccountsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/accounts')) or die("Could not open source accounts database in $sourceDir \n");
+my $dstAccountsDb = esmith::AccountsDB->open('accounts') or die("Could not open destination accounts db\n");
 
-foreach my $ibay ($accountsDb->ibays()) {
+foreach my $ibay ($dstAccountsDb->ibays()) {
     my $ibayName = $ibay->key;
     my $isCreated = defined $ibay->prop('__new') ;
+
+    if( ! $srcAccountsDb->get($ibayName)) {
+	warn "[INFO] ibay $ibayName is not in source accounts DB: skipped.\n";
+	next;
+    }
 
     my $eventName = $isCreated ? 'ibay-create' : 'ibay-modify';
     if( ! esmith::event::event_signal($eventName, $ibayName)) {
@@ -53,12 +59,6 @@ foreach my $ibay ($accountsDb->ibays()) {
 
     if($isCreated) {
 	$ibay->delete_prop('__new');
-    }
-
-    # Skip data migration,  if destination exists:
-    if( -d  '/var/lib/nethserver/ibay/' . $ibayName) {
-	warn "[WARNING] $ibayName: ibay directory exists. Data migration skipped.\n";
-	next;
     }
 
     # Migrate data
