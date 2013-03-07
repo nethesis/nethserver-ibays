@@ -60,13 +60,12 @@ foreach my $srcIbay ($srcAccountsDb->ibays()) {
     my $ibayName = $srcIbay->key;
     my $isCreated = $dstAccountsDb->get($ibayName) ? 0 : 1;
     my $dstIbay = $dstAccountsDb->get($ibayName) 
-	|| $dstAccountsDb->new_record($ibayName, {type => 'ibay'});
+	|| $dstAccountsDb->new_record($ibayName, {type => 'ibay-migrate'});
 
     my %access = %{defined $accessMap{$srcIbay->prop('UserAccess')} ? 
 		       $accessMap{$srcIbay->prop('UserAccess')} : $accessMap{default}};
 
     $dstIbay->merge_props(
-	$isCreated ? ('__new' => '1') : (),  # mark as a new record
 	Description => join(' ', $srcIbay->prop('Name'), '[migration]'),
 	OwningGroup => $srcIbay->prop('Group'),	
 	AclRead => '',

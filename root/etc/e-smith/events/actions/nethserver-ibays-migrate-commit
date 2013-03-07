@@ -41,42 +41,34 @@ if( ! $sourceDir ) {
 my $srcAccountsDb = esmith::AccountsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/accounts')) or die("Could not open source accounts database in $sourceDir \n");
 my $dstAccountsDb = esmith::AccountsDB->open('accounts') or die("Could not open destination accounts db\n");
 
-foreach my $ibay ($dstAccountsDb->ibays()) {
+foreach my $ibay ($dstAccountsDb->get_all_by_prop('type' => 'ibay-migrate')) {
     my $ibayName = $ibay->key;
-    my $isCreated = defined $ibay->prop('__new') ;
 
-    if( ! $srcAccountsDb->get($ibayName)) {
-	warn "[INFO] ibay $ibayName is not in source accounts DB: skipped.\n";
-	next;
+    $ibay->set_prop('type', 'ibay');
+    my $ibayPath = '/var/lib/nethserver/ibay/' . $ibayName;
+
+    # Migrate data BEFORE creating ibay, because DocumentRoot can be
+    # set to html/ subdirectory, and it must exist to avoid httpd
+    # startup problems.
+    if( ! -d $ibayPath) {
+	mkdir $ibayPath;
     }
 
-    my $eventName = $isCreated ? 'ibay-create' : 'ibay-modify';
-    if( ! esmith::event::event_signal($eventName, $ibayName)) {
-	warn("[ERROR] $eventName $ibayName event failed\n");
-	$errors++;
-	next;
-    }
-
-    if($isCreated) {
-	$ibay->delete_prop('__new');
-    }
-
-    # Migrate data
     if( ! migrateDir(
 	      $sourceDir . '/home/e-smith/files/ibays/' . $ibayName, 
-	      '/var/lib/nethserver/ibay/' . $ibayName
+	      $ibayPath
 	)) {
-	    warn("[ERROR] failed to migrate $ibayName ibay directory.\n");
-	    $errors++;
-	    next;
-    }
-    
-    if( ! esmith::event::event_signal('ibay-reset-permissions', $ibayName)) {
-	warn("[ERROR] ibay-reset-permissions $ibayName event failed\n");
+	warn("[ERROR] failed to migrate $ibayName ibay directory.\n");
+	$errors++;
+	next;
+    }	
+
+    if( ! esmith::event::event_signal('ibay-create', $ibayName)) {
+	warn("[ERROR] ibay-create $ibayName event failed!\n");
 	$errors++;
 	next;
     }
-	
+
 }
 
 # Restore ACLs
