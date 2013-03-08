@@ -94,7 +94,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $subjects = array(array('shared', $view->translate('Authenticated users')));
 
         foreach ($this->getPlatform()->getDatabase('accounts')->getAll('group') as $keyName => $props) {
-            $entry = array($keyName, sprintf("%s (%s)", $props['Description'], $keyName));
+            $entry = array($keyName, sprintf("%s (%s)", isset($props['Description']) ? $props['Description'] : $keyName, $keyName));
             $owners[] = $entry;
             $subjects[] = $entry;
         }
