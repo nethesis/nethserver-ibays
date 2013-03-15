@@ -49,8 +49,9 @@ my $ibayPath = $ibayBasePath . $ibayName;
 my $OwningGroup = $ibay->prop('OwningGroup') ?  $ibay->prop('OwningGroup') : 'root';
 my $GroupAccess = $ibay->prop('GroupAccess') ?  $ibay->prop('GroupAccess') : 'rw';
 my $OtherAccess = $ibay->prop('OtherAccess') ?  $ibay->prop('OtherAccess') : '';
-my @AclRead = $ibay->prop('AclRead') ? split(',', $ibay->prop('AclRead')) : '';
-my @AclWrite = $ibay->prop('AclWrite') ? split(',', $ibay->prop('AclWrite')) : '';
+my @AclRead = $ibay->prop('AclRead') ? split(',', $ibay->prop('AclRead')) : ();
+my @AclWrite = $ibay->prop('AclWrite') ? split(',', $ibay->prop('AclWrite')) : ();
+my @AclList = $ibay->prop('AclList') ? split(',', $ibay->prop('AclList')) : ();
 
 my $basePerms = 0600;
 
@@ -97,10 +98,12 @@ sub prepareAcls
 
 }
 
-my @acls = prepareAcls();
+# Raw ACLs are appended to those specified through AlcRead and
+# AclWrite props (see #1736):
+my @acls = (prepareAcls(), @AclList);
 
 # open a pipe to setfacl and pass the file list to it:
-open(my $psetfacl, '| /usr/bin/setfacl -b ' . ( @acls ? ('-m ' . join(',', @acls)) : '') . ' - ') || die('setfacl error: ' . $!);
+open(my $psetfacl, '|-', '/usr/bin/setfacl -b' . ( @acls ? (' -m ' . join(',', @acls)) : '') . ' - ') || die('setfacl error: ' . $!);
 
 sub process
 {
