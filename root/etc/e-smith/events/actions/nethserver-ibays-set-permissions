@@ -88,8 +88,8 @@ sub prepareAcls
 	$p{$user} |= 4;
     }
 
-    # Build the account-specific ACL expression list:
-    return map { 
+    # Build default and account-specific ACL expression list:
+    return map { ('d:' . $_, $_) } map { 
 	join(':', 
 	     ($p{$_} & 1) ? 'g' : 'u',     # is user or group
 	     $_, 
@@ -107,12 +107,12 @@ sub prepareAcls
 my @acls = (prepareAcls(), @AclList);
 
 # Open a pipe to setfacl for file entries only. Old ACLs are
-# removed:
-open(my $psetfaclFiles, '|-', '/usr/bin/setfacl -b' . ( @acls ? (' -m ' . join(',', @acls)) : '') . ' - ') || die('[ERROR] setfacl (files) error: ' . $!);
+# removed, "default" ACLs are skipped:
+open(my $psetfaclFiles, '|-', '/usr/bin/setfacl -b' . ( @acls ? (' -m ' . join(',', grep { $_ !~ /^d(efault)?:/} @acls)) : '') . ' - ') || die('[ERROR] setfacl (files) error: ' . $!);
 
 # Open a pipe to setfacl for dir entries only. Old ACLs are
 # removed:
-open(my $psetfaclDirs, '|-', '/usr/bin/setfacl -k -b' . ( @acls ? (' -m ' . join(',', map { ('d:' . $_, $_) } @acls)) : '') . ' - ') || die('[ERROR] setfacl (dirs) error: ' . $!);
+open(my $psetfaclDirs, '|-', '/usr/bin/setfacl -k -b' . ( @acls ? (' -m ' . join(',', @acls)) : '') . ' - ') || die('[ERROR] setfacl (dirs) error: ' . $!);
 
 
 sub process
