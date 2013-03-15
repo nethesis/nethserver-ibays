@@ -27,12 +27,12 @@ use Errno;
 use File::Find;
 use esmith::util;
 use esmith::AccountsDB;
-use Data::Dumper;
 
 my $ibayBasePath = '/var/lib/nethserver/ibay/';
 
 my $event = shift;
 my $ibayName = shift;
+my $errors = 0;
 
 die "ibayName argument missing" unless defined ($ibayName);
 
@@ -88,22 +88,32 @@ sub prepareAcls
 	$p{$user} |= 4;
     }
 
-    return map { join(':', 
-		      ($p{$_} & 1) ? 'g' : 'u',     # is user or group
-		      $_, 
-		      (($p{$_} & 4) ? 'r' : '') .   # has read access
-		      (($p{$_} & 2) ? 'w' : '') .   # has write access
-		      'X'                           # conditional eXecute bit (see manpage setfacl)
-		     ) } grep { $p{$_} > 1 } keys %p;
-
+    # Build the account-specific ACL expression list:
+    return map { 
+	join(':', 
+	     ($p{$_} & 1) ? 'g' : 'u',     # is user or group
+	     $_, 
+	     (($p{$_} & 4) ? 'r' : '') .   # has read access
+	     (($p{$_} & 2) ? 'w' : '') .   # has write access
+	     'X'                           # conditional eXecute
+	     # bit (see manpage
+	     # setfacl)	     
+	    ) } grep { $p{$_} > 1 } keys %p;
+    
 }
 
 # Raw ACLs are appended to those specified through AlcRead and
 # AclWrite props (see #1736):
 my @acls = (prepareAcls(), @AclList);
 
-# open a pipe to setfacl and pass the file list to it:
-open(my $psetfacl, '|-', '/usr/bin/setfacl -b' . ( @acls ? (' -m ' . join(',', @acls)) : '') . ' - ') || die('setfacl error: ' . $!);
+# Open a pipe to setfacl for file entries only. Old ACLs are
+# removed:
+open(my $psetfaclFiles, '|-', '/usr/bin/setfacl -b' . ( @acls ? (' -m ' . join(',', @acls)) : '') . ' - ') || die('[ERROR] setfacl (files) error: ' . $!);
+
+# Open a pipe to setfacl for dir entries only. Old ACLs are
+# removed:
+open(my $psetfaclDirs, '|-', '/usr/bin/setfacl -k -b' . ( @acls ? (' -m ' . join(',', map { ('d:' . $_, $_) } @acls)) : '') . ' - ') || die('[ERROR] setfacl (dirs) error: ' . $!);
+
 
 sub process
 {
@@ -133,11 +143,15 @@ sub process
     chmod $perms, $_;
 
     # send the file full path into the pipe:
-    print $psetfacl $File::Find::name . "\n";
+    print {-d $_ ? $psetfaclDirs : $psetfaclFiles} $File::Find::name . "\n";
 }
 
 chdir $ibayPath;
 find(\&process, $ibayPath);
-close($psetfacl);
+
+close($psetfaclFiles) || $errors++;
+close($psetfaclDirs) || $errors++;
+
+exit($errors == 0 ? 0 : 1);
 
 
