@@ -3,9 +3,9 @@ Summary: Shared directories configuration
 Version: @@VERSION@@
 Release: @@RELEASE@@
 License: GPL
-Group: System Environment/Base
+URL: %{url_prefix}/%{name} 
 Source: %{name}-%{version}.tar.gz
-BuildRoot: /var/tmp/%{name}-%{version}-%{release}-buildroot
+
 BuildArch: noarch
 Requires: nethserver-directory
 Requires: nethserver-base
@@ -38,7 +38,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
 
-
-
 %changelog
+* Tue Mar 19 2013 Davide Principi <davide.principi@nethesis.it> - 1.1.0-1.ns6
+- Raw Posix ACLs in AclList prop of ibay records. Refs #1736
+- Migration support. Refs #1688
+- *.spec.in: fixed URL and Release tags expansion, removed obsolete Group and BuildRoot tags
 
