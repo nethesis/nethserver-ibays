@@ -75,3 +75,10 @@ event_actions('migration-import', qw(
     nethserver-ibays-migrate-begin  30
     nethserver-ibays-migrate-commit 60
 ));
+
+#
+# pre-backup-config event
+#
+event_actions('pre-backup-config', qw(
+    nethserver-ibasy-dump-acls      50
+));
