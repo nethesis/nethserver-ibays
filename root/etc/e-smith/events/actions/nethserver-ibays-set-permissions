@@ -54,18 +54,23 @@ my @AclWrite = $ibay->prop('AclWrite') ? split(',', $ibay->prop('AclWrite')) : (
 my @AclList = $ibay->prop('AclList') ? split(',', $ibay->prop('AclList')) : ();
 
 my $basePerms = 0600;
+my $groupPerms = '';
 
 if($GroupAccess =~ /r/) {
     $basePerms |= 040;
+    $groupPerms .= 'r';
 }
 
 if($GroupAccess =~ /w/) {
     $basePerms |= 020;
+    $groupPerms .= 'w';
 }
 
 if($OtherAccess =~ /r/) {
     $basePerms |= 04;
 }
+
+#warn sprintf("[INFO] basePerms %o\n", $basePerms);
 
 sub prepareAcls
 {
@@ -108,11 +113,16 @@ my @acls = (prepareAcls(), @AclList);
 
 # Open a pipe to setfacl for file entries only. Old ACLs are
 # removed, "default" ACLs are skipped:
-open(my $psetfaclFiles, '|-', '/usr/bin/setfacl -b' . ( @acls ? (' -m ' . join(',', grep { $_ !~ /^d(efault)?:/} @acls)) : '') . ' - ') || die('[ERROR] setfacl (files) error: ' . $!);
+my $cmd1 = '/usr/bin/setfacl -b' . ( @acls ? (' -m ' . join(',', grep { $_ !~ /^d(efault)?:/} @acls, "g::$groupPerms")) : '') . ' - ';
+#print "$cmd1\n";
+open(my $psetfaclFiles, '|-', $cmd1) || die('[ERROR] setfacl (files) error: ' . $!);
+
 
 # Open a pipe to setfacl for dir entries only. Old ACLs are
 # removed:
-open(my $psetfaclDirs, '|-', '/usr/bin/setfacl -k -b' . ( @acls ? (' -m ' . join(',', @acls)) : '') . ' - ') || die('[ERROR] setfacl (dirs) error: ' . $!);
+my $cmd2 = '/usr/bin/setfacl -b -k' . ( @acls ? (' -m ' . join(',', @acls, "g::${groupPerms}x")) : '') . ' - ';
+#print "$cmd2\n";
+open(my $psetfaclDirs, '|-', $cmd2) || die('[ERROR] setfacl (dirs) error: ' . $!);
 
 
 sub process
@@ -139,8 +149,8 @@ sub process
 	return;
     }
     
-    # printf "chmod %o %s\n", $perms, $_;
-    chmod $perms, $_;
+    #printf "chmod %o %s\n", $perms, $_;
+    chmod $perms, $_ || warn ("FAILED");
 
     # send the file full path into the pipe:
     print {-d $_ ? $psetfaclDirs : $psetfaclFiles} $File::Find::name . "\n";
