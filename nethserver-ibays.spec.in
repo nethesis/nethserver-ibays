@@ -19,8 +19,6 @@ services provided by other packages, such as Samba, Sftp, Http
 %setup
 
 %post
-source /etc/nethserver/rpm_hook_functions
-event_queue add %{name}-update
 
 %build
 perl createlinks
