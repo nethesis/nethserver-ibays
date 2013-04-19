@@ -35,6 +35,11 @@ event_actions('ibay-create', qw(
 	     nethserver-ibays-set-permissions 20
 ));
 
+# modify
+event_actions('ibay-modify', qw(
+	     nethserver-ibays-set-permissions 20
+));
+
 # delete
 event_actions('ibay-delete', 
 	     'nethserver-ibays-ibay-delete' => '15'

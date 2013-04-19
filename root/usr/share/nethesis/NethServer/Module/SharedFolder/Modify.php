@@ -31,6 +31,10 @@ use Nethgui\Controller\Table\Modify as Table;
 class Modify extends \Nethgui\Controller\Table\Modify
 {
 
+    private $originalAclRead;
+    private $originalAclWrite;
+
+
     public function initialize()
     {
         /*
@@ -60,24 +64,26 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::initialize();
     }
 
+    public function bind(\Nethgui\Controller\RequestInterface $request)
+    {
+        parent::bind($request);
+        if($request->isMutation()) {
+            // save the old values for later usage:
+            $this->originalAclRead = $this->getPlatform()->getDatabase('accounts')->getProp($this->parameters['ibay'], 'AclRead');
+            $this->originalAclWrite = $this->getPlatform()->getDatabase('accounts')->getProp($this->parameters['ibay'], 'AclWrite');
+        }
+    }
+
     protected function onParametersSaved($changedParameters)
     {
         $action = $this->getIdentifier();
         if ($action == 'update') {
             $action = 'modify';
         }
-        $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $action), array($this->parameters['ibay']));
 
-        // Reset permissions if one of the following fields was modified (refs #1548):
-        if (count(array_intersect(array(
-                    'OwningGroup',
-                    'GroupAccess',
-                    'OtherAccess',
-                    'AclRead',
-                    'AclWrite'
-                    ), $changedParameters)) > 0) {
-            $this->getPlatform()->signalEvent(sprintf('ibay-reset-permissions@post-process', $action), array($this->parameters['ibay']));
-        }
+        $eventArgs = array($this->parameters['ibay'], '--orig-acl-read', $this->originalAclRead, '--orig-acl-write', $this->originalAclWrite);
+
+        $this->getPlatform()->signalEvent(sprintf('ibay-%s@post-process', $action), $eventArgs);
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
