@@ -85,5 +85,5 @@ event_actions('migration-import', qw(
 # pre-backup-config event
 #
 event_actions('pre-backup-config', qw(
-    nethserver-ibasy-dump-acls      50
+    nethserver-ibays-dump-acls      50
 ));
