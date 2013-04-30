@@ -37,6 +37,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Tue Apr 30 2013 Davide Principi <davide.principi@nethesis.it> - 2.0.0-1.ns6
+- ACLs template for system users and groups #1891
+- Fixed application of permissions for owning group #1863
+- Backup POSIX ACLs #1848
+
 * Tue Mar 19 2013 Davide Principi <davide.principi@nethesis.it> - 1.1.0-1.ns6
 - Raw Posix ACLs in AclList prop of ibay records. Refs #1736
 - Migration support. Refs #1688
