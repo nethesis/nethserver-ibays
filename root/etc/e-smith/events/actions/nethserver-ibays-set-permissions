@@ -158,10 +158,10 @@ sub process($)
     if($isReset) {
 	# prepend basic owner acls. Required by --set       
 	@argsDirs = ('--set', join(',', getOwnerAcl($dirPerms), @modifyArgs));	
-	@argsFiles = ('--set', join(',', getOwnerAcl($basePerms), grep { $_ !~ /^d:/ } @modifyArgs));
+	@argsFiles = ('--set', join(',', grep { $_ !~ /^d:/ } getOwnerAcl($basePerms), @modifyArgs));
     } else {
 	@argsDirs = ('-m', join(',', getOwnerAcl($dirPerms), @modifyArgs));
-	@argsFiles = ('-m', join(',', getOwnerAcl($basePerms), grep { $_ !~ /^d:/ } @modifyArgs));
+	@argsFiles = ('-m', join(',', grep { $_ !~ /^d:/ } getOwnerAcl($basePerms), @modifyArgs));
 
 	if(@removeArgs) {
 	    unshift @argsDirs, '-x', join(',', @removeArgs);
@@ -251,8 +251,11 @@ sub getOwnerAcl($)
 	    $s->[$i] = $p;
 	}
     }
-	          
-    return sprintf('u::%s,g::%s,o::%s', join('', @{$u}), join('', @{$g}), join('', @{$o}));
+	   
+    return map { 
+	($_->[0] . '::' . join('', @{$_->[1]})), 
+	('d:' . $_->[0] . '::' . join('', @{$_->[1]}))
+    } ['u', $u], ['g', $g], ['o', $o];
 }
 
 #
