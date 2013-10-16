@@ -37,6 +37,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Oct 16 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.0.1-1.ns6
+- Fix write permission for owning group #2156
+- Backup ibay directory structure in backup-config #2043
+
 * Tue Apr 30 2013 Davide Principi <davide.principi@nethesis.it> - 2.0.0-1.ns6
 - ACLs template for system users and groups #1891
 - Fixed application of permissions for owning group #1863
