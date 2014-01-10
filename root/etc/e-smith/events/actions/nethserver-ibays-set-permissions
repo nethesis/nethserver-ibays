@@ -24,7 +24,9 @@
 use strict;
 use Errno;
 use File::Find;
-use esmith::util;
+use File::stat;
+use User::pwent;
+use User::grent;
 use esmith::AccountsDB;
 use esmith::templates;
 use Getopt::Long;
@@ -88,6 +90,20 @@ exit(0);
 #  Subroutines
 # #####################################
 
+sub getOwners($)
+{
+    my $ibayPath = shift;
+    my $statObj = stat($ibayPath);
+    if( ! $statObj) {
+	my $adminEnt = getpwnam('admin');
+	if( ! $adminEnt) {
+	    warn "[WARNING] admin account not found!";
+	    return (0,0);
+	}
+	return ($adminEnt->uid, $adminEnt->gid);
+    }    
+    return ($statObj->uid, $statObj->gid);
+}
 
 sub process($)
 {
@@ -101,12 +117,19 @@ sub process($)
     my @modifyArgs = ();  # ACLs to -m (modify)
     my @removeArgs = ();  # ACLs to -x (remove)
 
+    my ($ownUid, $ownGid) = getOwners($ibayPath);
+    if($ibay->prop('OwningGroup')) {
+	my $owningGroupEnt = getgrnam($ibay->prop('OwningGroup'));
+	if($owningGroupEnt) {
+	    $ownGid = $owningGroupEnt->gid;
+	}
+    }
+
     # isReset? Do we want to reset ACLs or modify the existing ones?
     # If the action is invoked with either --orig-acl-read or --orig-acl-write options
     # we assume a "modify" action is required.
     my $isReset = ! (defined $origAclRead || defined $origAclWrite);
 
-    my $owningGroup = $ibay->prop('OwningGroup') ?  $ibay->prop('OwningGroup') : 'root';
     my $groupAccess = $ibay->prop('GroupAccess') ?  $ibay->prop('GroupAccess') : 'rw';
     my $otherAccess = $ibay->prop('OtherAccess') ?  $ibay->prop('OtherAccess') : '';
 
@@ -126,7 +149,7 @@ sub process($)
 
     # Set execute and set-gid bits on directories:
     my $dirPerms = $basePerms 
-	| 0100 # always executable bit for owner (root)
+	| 0100 # always executable bit for owner (admin)
 	| ($basePerms & 040 ? 02010 : 0) # is readable by group? => set-gid + group-exec
 	| ($basePerms & 004 ? 1 : 0) # is readable by others? => other-exec
      ;
@@ -188,7 +211,7 @@ sub process($)
 	    return;
 	}
 
-	esmith::util::chownFile('root', $owningGroup, $_);
+	chown $ownUid, $ownGid, $_;
 
 	my $perms = 0;
 	
