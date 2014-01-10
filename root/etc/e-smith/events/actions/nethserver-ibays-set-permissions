@@ -62,8 +62,8 @@ if ($ibay->prop('type') ne 'ibay') {
 
 # This is a map of the account types (group/user), used to check if an
 # account exists and obtain its type. It is initialized with builtin
-# group "shared":
-my %accountTypes = ( 'shared' => 1 );
+# group "locals":
+my %accountTypes = ( 'locals' => 1 );
 
 # Fill the %accountTypes: is it a user=0 or group=1?
 $accountTypes{$_->key} = 0 foreach ($accountsDb->users); 

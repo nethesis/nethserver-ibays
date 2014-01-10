@@ -31,29 +31,7 @@ use esmith::event;
 
 my $errors = 0;
 my $accountsDb = esmith::AccountsDB->open_ro() or die("Fatal error opening accounts DB\n");
-my $luseradd = '/usr/sbin/luseradd';
-my $lgroupmod = '/usr/sbin/lgroupmod';
 my $ibayBasePath = '/var/lib/nethserver/ibay/';
-
-#
-# Create shared group if not exists
-#
-my $uid = getpwnam('shared');
-
-if( ! $uid) {
-    qx($luseradd -s /bin/false -r shared);
-}
-
-my @users = map { $_->key } $accountsDb->users();
-
-#
-# Assign admin and all known users to shared group:
-#
-system($lgroupmod, '-M', join(',', 'admin', @users), 'shared');
-
-if($? != 0) {
-    $errors ++;
-}
 
 #
 # Create ibay if db record is present but directory is missing:
