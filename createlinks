@@ -53,7 +53,6 @@ event_actions('ibay-reset-permissions', qw(
 # package install/update
 event_actions('nethserver-ibays-update', qw(
 	     initialize-default-databases 00
-	     nethserver-ibays-conf 30
 ));
 
 #--------------------------------------------------
@@ -94,3 +93,10 @@ event_actions('pre-backup-config', qw(
 ));
 
 
+#
+# FIXME: using runlevel-adjust event to initialize ibays from default DB
+# records:
+#
+event_actions('runlevel-adjust', qw(
+    create-default-ibays 96
+));

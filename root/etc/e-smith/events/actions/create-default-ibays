@@ -1,13 +1,7 @@
 #!/usr/bin/perl
 
-use strict;
-
 #
-# NethServer - nethserver-ibays-conf
-#
-
-#
-# Copyright (C) 2012 Nethesis S.r.l.
+# Copyright (C) 2014 Nethesis S.r.l.
 # http://www.nethesis.it - support@nethesis.it
 # 
 # This script is part of NethServer.
@@ -26,22 +20,23 @@ use strict;
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+use strict;
 use esmith::AccountsDB;
 use esmith::event;
 
 my $errors = 0;
 my $accountsDb = esmith::AccountsDB->open_ro() or die("Fatal error opening accounts DB\n");
-my $ibayBasePath = '/var/lib/nethserver/ibay/';
+my $ibayBasePath = '/var/lib/nethserver/ibay';
+my $esmithDefaults = '/etc/e-smith/db/accounts';
 
-#
-# Create ibay if db record is present but directory is missing:
-#
 foreach my $ibay ($accountsDb->ibays()) {
     my $ibayName = $ibay->key();
-    if ( -d $ibayBasePath . $ibayName ) {
+    if ( -d "$ibayBasePath/$ibayName" || ! -d "$esmithDefaults/$ibayName") {
 	next;
     }
-
+    
+    # Create ibay if db default record is present but directory is
+    # missing:    
     if(event_signal('ibay-create', $ibayName) == 0) {
 	$errors ++;
     }
