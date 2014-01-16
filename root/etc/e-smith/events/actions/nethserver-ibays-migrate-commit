@@ -73,7 +73,7 @@ foreach my $ibay ($dstAccountsDb->get_all_by_prop('type' => 'ibay-migrate')) {
 
 # Restore ACLs
 chdir '/var/lib/nethserver/ibay/';
-system('/usr/bin/setfacl', '--restore=' . $sourceDir . '/home/e-smith/db/acls.dump');
+system("/bin/sed 's/^group:shared:/group:locals:/' $sourceDir/home/e-smith/db/acls.dump | /usr/bin/setfacl --restore=/dev/stdin");
 if($? != 0) {
     warn("[ERROR] failed to restore POSIX ACLs\n");
     $errors++;
