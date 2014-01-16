@@ -94,15 +94,24 @@ sub getOwners($)
 {
     my $ibayPath = shift;
     my $statObj = stat($ibayPath);
-    if( ! $statObj) {
-	my $adminEnt = getpwnam('admin');
-	if( ! $adminEnt) {
-	    warn "[WARNING] admin account not found!";
-	    return (0,0);
-	}
-	return ($adminEnt->uid, $adminEnt->gid);
-    }    
-    return ($statObj->uid, $statObj->gid);
+
+    # Keep owner unchanged, if set.
+    if(defined $statObj && $statObj->uid > 0) {
+	return ($statObj->uid, $statObj->gid);
+    }
+
+    # Change owner. Establish default value:
+
+    my ($uid, $gid) = (0, 0); # default root
+    my $adminEnt = getpwnam('admin');
+    if($adminEnt) {
+        # default admin, if exists
+	($uid, $gid) = ($adminEnt->uid, $adminEnt->gid); 
+    } else {
+	warn "[WARNING] admin account not found!";
+    }
+
+    return ($uid, $gid);
 }
 
 sub process($)
