@@ -67,7 +67,7 @@ foreach my $srcIbay ($srcAccountsDb->ibays()) {
 
     $dstIbay->merge_props(
 	Description => join(' ', $srcIbay->prop('Name'), '[migration]'),
-	OwningGroup => $srcIbay->prop('Group'),	
+	OwningGroup => ($srcIbay->prop('Group') eq 'shared' ? 'locals' : $srcIbay->prop('Group')),
 	AclRead => '',
 	AclWrite => '',
 	%access);
