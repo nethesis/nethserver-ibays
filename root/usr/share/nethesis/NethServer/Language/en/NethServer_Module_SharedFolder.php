@@ -3,7 +3,7 @@
 $L['AclRead_label'] = 'Read'; 
 $L['AclWrite_label'] = 'Write'; 
 $L['Acl_Title'] = 'ACL'; 
-$L['Authenticated users'] = 'Authenticated users'; 
+$L['locals_group_label'] = 'Local users'; 
 $L['BaseInfo_Title'] = 'General'; 
 $L['Create_Header'] = 'Create a new shared folder'; 
 $L['GroupAccess_label'] = 'Allow write permission to owning group'; 

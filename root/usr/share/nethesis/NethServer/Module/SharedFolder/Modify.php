@@ -96,8 +96,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
 
-        $owners = array(array('locals', $view->translate('Authenticated users')));
-        $subjects = array(array('locals', $view->translate('Authenticated users')));
+        $owners = array(array('locals', $view->translate('locals_group_label')));
+        $subjects = array(array('locals', $view->translate('locals_group_label')));
 
         foreach ($this->getPlatform()->getDatabase('accounts')->getAll('group') as $keyName => $props) {
             $entry = array($keyName, sprintf("%s (%s)", isset($props['Description']) ? $props['Description'] : $keyName, $keyName));

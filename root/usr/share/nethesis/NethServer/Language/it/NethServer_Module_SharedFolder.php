@@ -3,7 +3,7 @@
 $L['AclRead_label'] = 'Lettura'; 
 $L['AclWrite_label'] = 'Scrittura'; 
 $L['Acl_Title'] = 'ACL'; 
-$L['Authenticated users'] = 'Utenti autenticati'; 
+$L['locals_group_label'] = 'Utenti locali'; 
 $L['BaseInfo_Title'] = 'Generali'; 
 $L['Create_Header'] = 'Crea una nuova cartella condivisa'; 
 $L['GroupAccess_label'] = 'Consenti scrittura al gruppo proprietario'; 
