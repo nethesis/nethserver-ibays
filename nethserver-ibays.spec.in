@@ -9,7 +9,7 @@ Source: %{name}-%{version}.tar.gz
 BuildArch: noarch
 Requires: nethserver-directory
 Requires: nethserver-base
-BuildRequires: perl, perl(File::Path), nethserver-devtools
+BuildRequires: perl, perl(File::Path), nethserver-devtools >= 1.1.0-4
 
 %description 
 Information-bays (ibays) are filesystem directories accessible through
@@ -21,6 +21,7 @@ services provided by other packages, such as Samba, Sftp, Http
 %post
 
 %build
+%{makedocs}
 perl createlinks
 
 %install
