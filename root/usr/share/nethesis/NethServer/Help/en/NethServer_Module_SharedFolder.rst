@@ -2,8 +2,8 @@
 Shared folders
 ==============
 
-A shared folder (also known as I-bay) is a resource which can be
-accessed on the services installed on the system and permissions set
+A shared folder is a resource on the system which can be
+accessed according to services installed on the system and permissions set
 by this module.
 
 Create new / edit
@@ -16,15 +16,15 @@ General
 ^^^^^^^
 
 Name
-    The name of the shared folder can only contain letters a
-    letter. The maximum length of the name is 12 characters.
+    The name of the shared folder. It can only contain lower case letters,
+    numbers, dots, dashes and underscores. The maximum length of the name is 12 characters.
 
 Description
-    Optional field for a brief description of the shared folder .
+    Optional field for a brief description of the shared folder.
 
 Group owner
-    The group owner of the shared folder , only members of the
-    group can access .
+    The owning group of the shared folder, only members of the
+    group can access the folder.
 
 Allow writing to the group owner
     Allow write access to members of the owning group.
@@ -45,10 +45,10 @@ shared folder for each users or groups, in addition to those of the
 group owner.
 
 Read
-    Allow or deny read access to the user or group is selected.
+    Allow or deny read access to the user or group selected.
 
 Write 
-    Allow or deny the access in writing to the user or group is
+    Allow or deny the access in writing to the user or group 
     selected.
 
 
@@ -57,12 +57,12 @@ Delete
 
 Removes the folder and all its contents. *The action is not
 reversible!* The only way to recover the contents of a folder shared
-is removed to restore a backup.
+that as been removed is to restore a backup.
 
 Reset permissions
 -----------------
 
-Set the values configured using this module group
-owner and ACLs. The operation will be performed recursively on
+Set the group owner and ACLs configured using this module
+on all files in the folder. The operation will be performed recursively on
 all files and subfolders in the shared folder.
 
