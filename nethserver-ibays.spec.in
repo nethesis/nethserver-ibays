@@ -38,6 +38,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Wed Feb 26 2014 Davide Principi <davide.principi@nethesis.it> - 2.0.3-1.ns6
+- Minor code cleanup
+
 * Wed Feb 05 2014 Davide Principi <davide.principi@nethesis.it> - 2.0.2-1.ns6
 - RST format for help files - Enhancement #2627 [NethServer]
 - Ibay contents inherit default owner - Enhancement #2573 [NethServer]
