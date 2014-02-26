@@ -58,7 +58,6 @@ my %accessMap = (
 
 foreach my $srcIbay ($srcAccountsDb->ibays()) {
     my $ibayName = $srcIbay->key;
-    my $isCreated = $dstAccountsDb->get($ibayName) ? 0 : 1;
     my $dstIbay = $dstAccountsDb->get($ibayName) 
 	|| $dstAccountsDb->new_record($ibayName, {type => 'ibay-migrate'});
 
