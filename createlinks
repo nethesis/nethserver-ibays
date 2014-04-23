@@ -86,9 +86,9 @@ event_actions('pre-backup-config', qw(
 
 
 #
-# restore-backup-config event
+# post-restore-config event
 #
-event_actions('pre-backup-config', qw(
+event_actions('post-restore-config', qw(
     nethserver-ibays-restore         60
 ));
 
