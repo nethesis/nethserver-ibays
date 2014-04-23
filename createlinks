@@ -77,15 +77,6 @@ event_actions('migration-import', qw(
 ));
 
 #
-# pre-backup-config event
-#
-event_actions('pre-backup-config', qw(
-    nethserver-ibays-dump-acls      50
-    nethserver-ibays-backup         60
-));
-
-
-#
 # post-restore-config event
 #
 event_actions('post-restore-config', qw(
