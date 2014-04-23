@@ -77,9 +77,9 @@ event_actions('migration-import', qw(
 ));
 
 #
-# post-restore-config event
+# post-restore-data event
 #
-event_actions('post-restore-config', qw(
+event_actions('post-restore-data', qw(
     nethserver-ibays-restore         60
 ));
 

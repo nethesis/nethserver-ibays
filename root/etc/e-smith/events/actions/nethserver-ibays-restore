@@ -1,7 +1,7 @@
 #! /usr/bin/perl -w
 #
 # Copyright (C) 2013 Nethesis S.r.l.
-# Copyright (C) 2006 SME Server
+#
 # http://www.nethesis.it - support@nethesis.it
 # 
 # This script is part of NethServer.
@@ -26,10 +26,13 @@ use NethServer::BackupConfig;
 my $backup = new NethServer::BackupConfig();
 $backup->set_log_file("/var/log/restore-config.log");
 
-my $ret = system("tar -C / -xf /var/lib/nethserver/backup/ibay.tar");
+my $ret = 1;
 
-if ($ret != 0) {
-   $backup->bad_exit("Error during ibay restore",$ret);
+if ( -f '/var/lib/nethserver/backup/acls.dump' ) {
+    my $ret = system('setfacl --restore /var/lib/nethserver/backup/acls.dump');
+    if ($ret != 0) {
+        $backup->bad_exit("Error during ibay restore",$ret);
+    }
 }
 
 
