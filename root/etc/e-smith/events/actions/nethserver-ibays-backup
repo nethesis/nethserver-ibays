@@ -1,2 +1,0 @@
-#!/bin/bash
-/bin/find /var/lib/nethserver/ibay/ -maxdepth 1 -type d | xargs tar -rf /var/lib/nethserver/backup/ibay.tar --no-recursion
