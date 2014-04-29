@@ -21,8 +21,7 @@ Descripción
     Campo opcional para una breve descripción de la carpeta compartida.
 
 Propietario del grupo
-     El grupo propietario de la carpeta compartida, sólo los miembros del 
-     grupo puede acceder a la carpeta.
+     El grupo propietario de la carpeta compartida, sólo los miembros del grupo puede acceder a la carpeta.
 
 Permitir escribir al propietario del grupo
     Permitir el acceso de escritura a los miembros del grupo propietario.
