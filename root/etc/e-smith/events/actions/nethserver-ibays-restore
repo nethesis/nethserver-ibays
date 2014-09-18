@@ -29,7 +29,7 @@ $backup->set_log_file("/var/log/restore-config.log");
 my $ret = 1;
 
 if ( -f '/var/lib/nethserver/backup/acls.dump' ) {
-    my $ret = system('setfacl --restore /var/lib/nethserver/backup/acls.dump');
+    my $ret = system('cd /var/lib/nethserver/ibay; setfacl --restore /var/lib/nethserver/backup/acls.dump');
     if ($ret != 0) {
         $backup->bad_exit("Error during ibay restore",$ret);
     }
