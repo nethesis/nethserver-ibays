@@ -38,6 +38,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Thu Oct 02 2014 Davide Principi <davide.principi@nethesis.it> - 2.1.1-1.ns6
+- ACLs not restored - Bug #2860 [NethServer]
+
 * Wed Aug 20 2014 Davide Principi <davide.principi@nethesis.it> - 2.1.0-1.ns6
 - Backup config: minimize creation of new backup - Enhancement #2699 [NethServer]
 
