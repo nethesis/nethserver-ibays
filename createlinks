@@ -91,3 +91,10 @@ event_actions('post-restore-data', qw(
 event_actions('runlevel-adjust', qw(
     create-default-ibays 96
 ));
+
+#
+# pre-backup-data event
+#
+event_actions('pre-backup-data', qw(
+    nethserver-ibays-dump-acls         50
+));
