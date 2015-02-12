@@ -1,7 +1,7 @@
 Name: nethserver-ibays
 Summary: Shared directories configuration
-Version: @@VERSION@@
-Release: @@RELEASE@@
+Version: 2.1.2
+Release: 1
 License: GPL
 URL: %{url_prefix}/%{name} 
 Source: %{name}-%{version}.tar.gz
