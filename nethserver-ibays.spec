@@ -1,6 +1,6 @@
 Name: nethserver-ibays
 Summary: Shared directories configuration
-Version: 2.1.2
+Version: 2.1.3
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -38,6 +38,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Thu Apr 02 2015 Davide Principi <davide.principi@nethesis.it> - 2.1.3-1
+- Increase default maxIbayNameLength - Enhancement #3090 [NethServer]
+
 * Wed Oct 22 2014 Davide Principi <davide.principi@nethesis.it> - 2.1.2-1.ns6
 - Ibay: acl dump not executed before backup - Bug #2912 [NethServer]
 
