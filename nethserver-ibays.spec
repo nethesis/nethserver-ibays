@@ -1,6 +1,6 @@
 Name: nethserver-ibays
 Summary: Shared directories configuration
-Version: 2.1.3
+Version: 2.1.4
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -38,6 +38,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Mon Jun 22 2015 Davide Principi <davide.principi@nethesis.it> - 2.1.4-1
+- Create Shared Folder tab not reset - Bug #3193 [NethServer]
+
 * Thu Apr 02 2015 Davide Principi <davide.principi@nethesis.it> - 2.1.3-1
 - Increase default maxIbayNameLength - Enhancement #3090 [NethServer]
 
