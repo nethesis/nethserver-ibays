@@ -1,6 +1,6 @@
 Name: nethserver-ibays
 Summary: Shared directories configuration
-Version: 2.1.3
+Version: 2.1.5
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -25,19 +25,27 @@ services provided by other packages, such as Samba, Sftp, Http
 perl createlinks
 
 %install
-rm -rf $RPM_BUILD_ROOT
-(cd root   ; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
-%{genfilelist} $RPM_BUILD_ROOT \
+rm -rf %{buildroot}
+(cd root   ; find . -depth -print | cpio -dump %{buildroot})
+%{genfilelist} %{buildroot} \
     > %{name}-%{version}-%{release}-filelist
 echo "%doc COPYING"          >> %{name}-%{version}-%{release}-filelist
 
 %clean 
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
+%dir %{_nseventsdir}/%{name}-update
+
 
 %changelog
+* Tue Sep 29 2015 Davide Principi <davide.principi@nethesis.it> - 2.1.5-1
+- Make Italian language pack optional - Enhancement #3265 [NethServer]
+
+* Mon Jun 22 2015 Davide Principi <davide.principi@nethesis.it> - 2.1.4-1
+- Create Shared Folder tab not reset - Bug #3193 [NethServer]
+
 * Thu Apr 02 2015 Davide Principi <davide.principi@nethesis.it> - 2.1.3-1
 - Increase default maxIbayNameLength - Enhancement #3090 [NethServer]
 
