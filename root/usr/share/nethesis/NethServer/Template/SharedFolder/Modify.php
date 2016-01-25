@@ -48,3 +48,12 @@ $buttons
 ;
 
 echo $buttons;
+
+$actionId = $view->getUniqueId();
+$view->includeJavascript("
+jQuery(function($){
+    $('#${actionId}').on('nethguishow', function () {
+        $(this).find('.Tabs').tabs('select', 0);
+    });
+});
+");
