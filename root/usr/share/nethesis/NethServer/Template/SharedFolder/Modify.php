@@ -11,14 +11,44 @@ if ($view->getModule()->getIdentifier() == 'update') {
     $template = 'Create_Header';
 }
 
+if ($view['isAD']) {
+    $guestAccess = $view->fieldset()->setAttribute('template', $T('SmbGuestAccess_label'));
+    $guestAccess->insert($view->radioButton('SmbGuestAccessType', 'none'));
+    $guestAccess->insert($view->radioButton('SmbGuestAccessType', 'r'));
+    $guestAccess->insert($view->radioButton('SmbGuestAccessType', 'rw'));
+} else {
+    $guestAccess = $view->hidden('SmbGuestAccessType');
+}
+
+$browseableState = $view->checkBox('SmbShareBrowseable', 'enabled')->setAttribute('uncheckedValue', 'disabled');
+
+$vfsRecycle = $view->fieldsetSwitch('SmbRecycleBinStatus', 'enabled', $view::FIELDSETSWITCH_EXPANDABLE | $view::FIELDSETSWITCH_CHECKBOX)
+    ->setAttribute('uncheckedValue', 'disabled')
+    ->insert($view->checkBox('SmbRecycleBinVersionsStatus', 'enabled')->setAttribute('uncheckedValue', 'disabled'))
+;
+
+$advanced = $view->panel();
+$advanced->insert($guestAccess);
+
+
+$advanced->insert($browseableState);
+$advanced->insert($vfsRecycle);
+
+$permissions = $view->panel()
+    ->insert($view->selector('OwningGroup', $view::SELECTOR_DROPDOWN))
+    ->insert($view->checkBox('GroupAccess', 'rw')->setAttribute('uncheckedValue', 'r'))
+    ->insert($view->checkBox('OtherAccess', 'r')->setAttribute('uncheckedValue', ''));
+
 echo $view->header('ibay')->setAttribute('template', $view->translate($template));
 $baseTab = $view->panel()->setAttribute('name', "BaseInfo")
     ->insert($view->textInput('ibay', $keyFlags))
-    ->insert($view->textInput('Description'))
-    ->insert($view->selector('OwningGroup', $view::SELECTOR_DROPDOWN))
-    ->insert($view->checkBox('GroupAccess', 'rw')->setAttribute('uncheckedValue', 'r'))
-    ->insert($view->checkBox('OtherAccess', 'r')->setAttribute('uncheckedValue', ''))
-;
+    ->insert($view->textInput('Description'));
+
+if ($view['isAD']) {
+    $baseTab->insert($permissions);
+}
+
+$baseTab->insert($advanced);
 
 $aclTab = $view->panel()->setAttribute('name', "Acl")
     ->insert($view->objectPicker()
@@ -28,11 +58,13 @@ $aclTab = $view->panel()->setAttribute('name', "Acl")
     ->insert($view->checkBox('AclWrite', FALSE))
 );
 
-echo $view->tabs()
-    ->insert($baseTab)
-    ->insertPlugins()
-    ->insert($aclTab)
-;
+$tabs = $view->tabs()->insert($baseTab);
+if ($view['isAD']) {
+    $tabs->insert($aclTab);
+}
+$tabs->insertPlugins();
+
+echo $tabs;
 
 $buttons = $view->buttonList()
     ->insert($view->button('Submit', $view::BUTTON_SUBMIT))

@@ -33,10 +33,32 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     private $originalAclRead;
     private $originalAclWrite;
+    private $userProvider = null;
+    private $groupProvider = null;
 
+    private function getUserProvider()
+    {
+        if(!$this->userProvider) {
+            $this->userProvider = new \NethServer\Tool\UserProvider($this->getPlatform());
+        }
+        return $this->userProvider;
+    }
+
+    private function getGroupProvider()
+    {
+        if(!$this->groupProvider) {
+            $this->groupProvider = new \NethServer\Tool\GroupProvider($this->getPlatform());
+        }
+        return $this->groupProvider;
+    }
 
     public function initialize()
     {
+        // Supported Samba ibay profiles
+        $this->profiles = array(
+            'default'
+        );
+
         /*
          * Refs #941, #1536. Avoid deletion of Primary ibay
          */
@@ -58,9 +80,29 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('AclRead', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclRead', ','), // ACL
             array('AclWrite', Validate::USERNAME_COLLECTION, Table::FIELD, 'AclWrite', ','), // ACL
             array('AclSubjects', FALSE, null),
+            array('SmbProfileType', FALSE, Table::FIELD),
+            array('SmbRecycleBinStatus', Validate::SERVICESTATUS, Table::FIELD),
+            array('SmbRecycleBinVersionsStatus', Validate::SERVICESTATUS, Table::FIELD),
+            array('SmbGuestAccessType', '/^(none|rw|r)$/', Table::FIELD),
+            array('SmbShareBrowseable', Validate::SERVICESTATUS, Table::FIELD),
         );
 
         $this->setSchema($parameterSchema);
+        $this
+            ->setDefaultValue('SmbProfileType', 'default')
+            ->setDefaultValue('SmbShareBrowseable', 'enabled')
+        ;
+        if ($this->getGroupProvider()->isAD()) {
+           $this->setDefaultValue('SmbGuestAccessType', 'none');
+        } else {
+           $this->setDefaultValue('SmbGuestAccessType', 'rw');
+        }
+
+        $profileNameValidator = $this->createValidator()->memberOf(array_merge($this->profiles, array('custom')));
+
+        $this->declareParameter('profileName', $profileNameValidator, array());
+        $this->declareParameter('customValue', $this->createValidator(), array());
+
         parent::initialize();
     }
 
@@ -96,25 +138,84 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
 
-        $owners = array(array('locals', $view->translate('locals_group_label')));
-        $subjects = array(array('locals', $view->translate('locals_group_label')));
+        $view['isAD'] = $this->getGroupProvider()->isAD();
+        $owners = array(array('Domain Users', $view->translate('domain_users_group_label')));
+        $subjects = array(array('Domain Users', $view->translate('domain_users_group_label')));
 
-        foreach ($this->getPlatform()->getDatabase('accounts')->getAll('group') as $keyName => $props) {
-            $entry = array($keyName, sprintf("%s (%s)", isset($props['Description']) ? $props['Description'] : $keyName, $keyName));
+        foreach ($this->getGroupProvider()->getGroups() as $keyName => $props) {
+            $entry = array($keyName, $keyName);
             $owners[] = $entry;
             $subjects[] = $entry;
         }
 
         $view['OwningGroupDatasource'] = $owners;
 
-        foreach ($this->getPlatform()->getDatabase('accounts')->getAll('user') as $keyName => $props) {
-            $entry = array($keyName, sprintf("%s (%s)", trim($props['FirstName'] . ' ' . $props['LastName']), $keyName));
+        foreach ($this->getUserProvider()->getUsers() as $keyName => $props) {
+            $entry = array($keyName, $keyName);
             $subjects[] = $entry;
         }
 
         $view['AclSubjects'] = $subjects;
 
         $view['reset-permissions'] = $view->getModuleUrl('../reset-permissions/' . $this->getAdapter()->getKeyValue());
+
+           if ($view['profileName'] === '') {
+            $view['profileName'] = 'default';
+        }
+        unset($view['SmbProfileType']);
+
+    }
+
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        $request = $this->getRequest();
+        // restrict custom profile name to a common "variable name" grammar:
+        if ($request->isMutation() && $this->parameters['profileName'] === 'custom') {
+            $this->getValidator('customValue')->regexp('/^[a-z][a-z0-9]+$/i');
+        }
+        parent::validate($report);
+    }
+
+    public function readProfileName()
+    {
+        if ( ! isset($this->parameters['SmbProfileType']) || empty($this->parameters['SmbProfileType'])) {
+            return '';
+        }
+        if (in_array($this->parameters['SmbProfileType'], $this->profiles)) {
+            return $this->parameters['SmbProfileType'];
+        }
+        return 'custom';
+    }
+
+    public function writeProfileName($value)
+    {
+        if (in_array($value, $this->profiles)) {
+            $this->parameters['SmbProfileType'] = $value;
+            return TRUE;
+        }
+    }
+
+    public function readCustomValue()
+    {
+        if ( ! isset($this->parameters['SmbProfileType']) || empty($this->parameters['SmbProfileType'])) {
+            return '';
+        }
+
+        if (in_array($this->parameters['SmbProfileType'], $this->profiles)) {
+            return '';
+        }
+
+        return $this->parameters['SmbProfileType'];
+    }
+
+    public function writeCustomValue($value)
+    {
+        $request = $this->getRequest();
+        if ($request->isMutation() && $request->hasParameter('customValue')) {
+            NETHGUI_DEBUG && $this->getLog()->notice(sprintf('COPY %s to SmbProfileType', $this->parameters['customValue']));
+            $this->parameters['SmbProfileType'] = $this->parameters['customValue'];
+            return TRUE;
+        }
     }
 
 }
