@@ -23,12 +23,6 @@
 use esmith::Build::CreateLinks qw(:all);
 use File::Path;
 
-# Group ownership is changed to admin group, 
-# if the ibay group owner is deleted:
-event_actions('group-delete', 
-	     "nethserver-ibays-reset-group" => "10"
-    );
-
 # create
 event_actions('ibay-create', qw(
 	     nethserver-ibays-ibay-create 15
@@ -48,6 +42,7 @@ event_actions('ibay-delete',
 # reset permissions
 event_actions('ibay-reset-permissions', qw(
 	     nethserver-ibays-set-permissions 20
+         nethserver-ibays-copy-permissions 30
 ));
 
 # package install/update
@@ -83,14 +78,6 @@ event_actions('post-restore-data', qw(
     nethserver-ibays-restore         60
 ));
 
-
-#
-# FIXME: using runlevel-adjust event to initialize ibays from default DB
-# records:
-#
-event_actions('runlevel-adjust', qw(
-    create-default-ibays 96
-));
 
 #
 # pre-backup-data event
