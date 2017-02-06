@@ -5,7 +5,7 @@ Shared folders
 A shared folder is a resource on the system which can be
 accessed using SMB/CIFS (Windows File and Printer Sharing) protocol. 
 
-Shared folders use Samba and work in guest mode without any account provider installed. However authenticated mode requires a samba backend, therefore nethserver-dc must be installed to manage the samba4 AD, being it local or remote.
+Shared folders use Samba and require an Active Directory account provider, being it local or remote. If an LDAP account provider or no account provider is configured at all, only guest mode access is provided.
 
 Create new / edit
 -----------------
