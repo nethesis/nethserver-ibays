@@ -1,0 +1,5 @@
+# nethserver-ibays
+
+This repository has been merged into nethserver-samba. The RPM package nethserver-samba now provides nethserver-ibays symbol. See
+
+https://github.com/nethserver/nethserver-samba
